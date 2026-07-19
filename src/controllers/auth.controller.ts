@@ -8,7 +8,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_enterprise_signing_ke
 
 /**
  * Handles user signup and registers a new account.
- * Merges first/last names into a single 'name' field to match your Prisma schema.
+ * Enforces mutual exclusivity (either email or phone, but not both).
  */
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -35,8 +35,9 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
     if (hasEmail) {
       registrationEmail = email.toLowerCase().trim();
     } else {
-      const cleanPhone = phone.trim().replace(/[^0-9]/g, '');
-      registrationEmail = `phone-${cleanPhone}@salesflow-placeholder.local`;
+      const cleanPhone = phone.trim();
+      const cleanPhoneDigits = cleanPhone.replace(/[^0-9]/g, '');
+      registrationEmail = `phone-${cleanPhoneDigits}@salesflow-placeholder.local`;
     }
 
     // Check duplicate credentials via the unique email field
@@ -78,7 +79,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
 /**
  * Handles user login and returns a signed session token.
- * Detects if the identifier is a phone number and maps it to the generated placeholder email.
+ * Passes the 'userId' key to match the database lookup in the middleware.
  */
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -121,8 +122,9 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       userRole = Role.ADMIN;
     }
 
+    // Signs token using the 'userId' payload parameter expected by auth.middleware.ts
     const token = jwt.sign(
-      { id: dbUser.id, email: dbUser.email, role: userRole },
+      { userId: dbUser.id, email: dbUser.email, role: userRole },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
