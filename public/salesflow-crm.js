@@ -401,38 +401,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function renderReportsChart(salesByMonth) {
-    const ctx = document.getElementById('revenue-progression-chart');
-    if (!ctx) return;
-
-    if (reportsChartInstance) {
-      reportsChartInstance.destroy();
-    }
-
-    const labels = salesByMonth.map(s => s.name);
-    const dataValues = salesByMonth.map(s => s.revenue);
-
-    reportsChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Revenue Trend',
-          data: dataValues,
-          borderColor: '#10b981',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
-
   // Main navigation view routing mechanics
   const sidebarMenus = {
     dashboard: { btn: document.getElementById('menu-btn-dashboard'), view: document.getElementById('view-dashboard') },
@@ -1328,16 +1296,17 @@ document.addEventListener('DOMContentLoaded', () => {
       let resultsCount = 0;
 
       const staticPages = [
-        { label: 'Executive Dashboard summary', key: 'dashboard' },
-        { label: 'Leads Management Directory', key: 'leads' },
-        { label: 'Converted Customers Index', key: 'customers' },
-        { label: 'Task Follow-up Checklists', key: 'tasks' },
-        { label: 'Email Communication Logs', key: 'emails' },
-        { label: 'SaaS Calculator Suite', key: 'calculator' },
-        { label: 'Workspace Notepad Notes', key: 'notes' },
-        { label: 'Flow AI Insights Copilot', key: 'aiInsights' },
-        { label: 'Reports & conversion Funnels', key: 'reports' },
-        { label: 'System Settings Profiles', key: 'settings' }
+        { label: 'Dashboard', key: 'dashboard' },
+        { label: 'Leads', key: 'leads' },
+        { label: 'Customers', key: 'customers' },
+        { label: 'Pipeline', key: 'pipeline' },
+        { label: 'Tasks', key: 'tasks' },
+        { label: 'Emails', key: 'emails' },
+        { label: 'Calculator', key: 'calculator' },
+        { label: 'Notes', key: 'notes' },
+        { label: 'AI Insights', key: 'aiInsights' },
+        { label: 'Reports', key: 'reports' },
+        { label: 'Settings', key: 'settings' }
       ];
 
       staticPages.forEach(page => {
