@@ -10,60 +10,52 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
-    .gradient-glow {
-      background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
-    }
   </style>
 </head>
-<body class="bg-[#080b18] bg-gradient-to-tr from-[#080b18] via-[#0d1125] to-[#12162d] text-slate-200 font-sans h-screen flex items-center justify-center p-4 relative overflow-hidden">
-
-  <!-- Ambient professional background glow -->
-  <div class="absolute inset-0 gradient-glow pointer-events-none z-0"></div>
-  <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
-  <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+<body class="bg-gradient-to-br from-[#f0f4f8] via-[#e6eef4] to-[#f4f7fa] text-slate-800 font-sans h-screen flex items-center justify-center p-4 relative overflow-hidden">
 
   <!-- AUTH CARD -->
-  <div class="w-full max-w-md bg-[#0f1326]/90 border border-blue-500/20 rounded-2xl p-8 shadow-2xl shadow-blue-500/5 backdrop-blur-md relative z-10">
+  <div class="w-full max-w-md bg-white border border-slate-200/80 rounded-2xl p-8 shadow-xl shadow-blue-900/5 relative z-10">
     
     <div class="text-center mb-8">
-      <h1 class="text-3xl font-extrabold text-white tracking-tight">SalesFlow CRM</h1>
-      <p id="auth-subtitle" class="text-slate-400 text-xs font-semibold mt-2">Sign in to your unified sales workspace</p>
+      <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">SalesFlow CRM</h1>
+      <p id="auth-subtitle" class="text-slate-500 text-xs font-semibold mt-2">Sign in to your unified sales workspace</p>
     </div>
 
     <!-- LOGIN FORM -->
     <form id="login-form" class="space-y-5" autocomplete="on">
       <div>
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address or Phone Number</label>
-        <input type="text" id="login-identifier" name="username" required placeholder="name@company.com or +234..." class="w-full px-4 py-3 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold placeholder:text-slate-500" autocomplete="username" />
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email Address or Phone Number</label>
+        <input type="text" id="login-identifier" name="username" required placeholder="name@company.com or +234..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold placeholder:text-slate-400" autocomplete="username" />
       </div>
       <div>
         <div class="flex justify-between items-center mb-2">
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
-          <button type="button" id="btn-toggle-forgot" class="text-blue-400 hover:text-blue-300 hover:underline text-xs font-bold focus:outline-none">Forgot Password?</button>
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Password</label>
+          <button type="button" id="btn-toggle-forgot" class="text-blue-600 hover:text-blue-700 hover:underline text-xs font-bold focus:outline-none">Forgot Password?</button>
         </div>
-        <input type="password" id="login-password" name="password" required class="w-full px-4 py-3 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="current-password" />
+        <input type="password" id="login-password" name="password" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="current-password" />
       </div>
-      <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-lg shadow-lg shadow-blue-500/10 transition-all focus:outline-none text-xs uppercase tracking-wider">Log In</button>
-      <p class="text-center text-xs text-slate-400 mt-4 font-bold">Don't have an account? <button type="button" id="btn-toggle-signup" class="text-blue-400 hover:underline focus:outline-none">Sign Up</button></p>
+      <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg shadow-md hover:shadow-blue-500/10 transition-all focus:outline-none text-xs uppercase tracking-wider">Log In</button>
+      <p class="text-center text-xs text-slate-500 mt-4 font-bold">Don't have an account? <button type="button" id="btn-toggle-signup" class="text-blue-600 hover:underline focus:outline-none">Sign Up</button></p>
     </form>
 
     <!-- SIGNUP FORM -->
     <form id="signup-form" class="space-y-4 hidden" autocomplete="off">
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">First Name</label>
-          <input type="text" id="signup-firstname" required class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="given-name" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">First Name</label>
+          <input type="text" id="signup-firstname" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="given-name" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Last Name</label>
-          <input type="text" id="signup-lastname" required class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="family-name" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Last Name</label>
+          <input type="text" id="signup-lastname" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="family-name" />
         </div>
       </div>
       
       <div class="grid grid-cols-2 gap-3">
         <div class="col-span-2">
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Gender</label>
-          <select id="signup-gender" required class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold">
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Gender</label>
+          <select id="signup-gender" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Prefer not to say">Prefer not to say</option>
@@ -73,66 +65,66 @@
 
       <!-- Mutually Exclusive Contact Selector -->
       <div class="space-y-3 pt-1">
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Registration Channel</label>
-        <div class="flex space-x-2 bg-[#161a32]/60 p-1 rounded-lg border border-slate-700/80">
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Registration Channel</label>
+        <div class="flex space-x-2 bg-slate-100 p-1 rounded-lg border border-slate-200">
           <button type="button" id="tab-signup-email" class="flex-1 py-1.5 text-[10px] font-bold rounded-md bg-blue-600 text-white transition-all">Sign Up with Email</button>
-          <button type="button" id="tab-signup-phone" class="flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all">Sign Up with Phone</button>
+          <button type="button" id="tab-signup-phone" class="flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">Sign Up with Phone</button>
         </div>
 
         <!-- Dynamic Inputs -->
         <div id="container-signup-email" class="space-y-1">
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
-          <input type="email" id="signup-email" required placeholder="name@company.com" class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="email" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label>
+          <input type="email" id="signup-email" required placeholder="name@company.com" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="email" />
         </div>
 
         <div id="container-signup-phone" class="space-y-1 hidden">
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Phone Number</label>
-          <input type="text" id="signup-phone" placeholder="+234..." class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="tel" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Phone Number</label>
+          <input type="text" id="signup-phone" placeholder="+234..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="tel" />
         </div>
       </div>
 
       <div>
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Password</label>
-        <input type="password" id="signup-password" required class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" autocomplete="new-password" />
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Password</label>
+        <input type="password" id="signup-password" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" autocomplete="new-password" />
       </div>
       <div>
-        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Workspace Name</label>
-        <input type="text" id="signup-workspace" class="w-full px-4 py-2.5 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" placeholder="SalesFlow CRM" autocomplete="organization" />
+        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Workspace Name</label>
+        <input type="text" id="signup-workspace" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" placeholder="SalesFlow CRM" autocomplete="organization" />
       </div>
       
-      <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-extrabold rounded-lg shadow-lg shadow-blue-500/10 transition-all focus:outline-none text-xs tracking-wider">Sign Up</button>
-      <p class="text-center text-xs text-slate-400 mt-4 font-bold">Already have an account? <button type="button" id="btn-toggle-login-from-signup" class="text-blue-400 hover:underline focus:outline-none">Log In</button></p>
+      <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg shadow-lg hover:shadow-blue-500/10 transition-all focus:outline-none text-xs tracking-wider">Sign Up</button>
+      <p class="text-center text-xs text-slate-500 mt-4 font-bold">Already have an account? <button type="button" id="btn-toggle-login-from-signup" class="text-blue-600 hover:underline focus:outline-none">Log In</button></p>
     </form>
 
     <!-- FORGOT PASSWORD RECOVERY FORM -->
     <form id="forgot-form" class="space-y-6 hidden" autocomplete="off">
-      <div class="flex items-center justify-between bg-slate-800/40 p-1.5 rounded-lg border border-slate-700/80">
+      <div class="flex items-center justify-between bg-slate-100 p-1.5 rounded-lg border border-slate-200">
         <button type="button" id="btn-forgot-mode-email" class="flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all">Email Recovery</button>
-        <button type="button" id="btn-forgot-mode-phone" class="flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all">SMS Recovery</button>
+        <button type="button" id="btn-forgot-mode-phone" class="flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all">SMS Recovery</button>
       </div>
       
       <!-- Identifier Step -->
       <div id="forgot-step-identifier" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2" id="forgot-input-label">Your Registered Email Address</label>
-          <input type="text" id="forgot-identifier" required placeholder="name@company.com" class="w-full px-4 py-3 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm font-semibold" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2" id="forgot-input-label">Your Registered Email Address</label>
+          <input type="text" id="forgot-identifier" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-sm font-semibold" />
         </div>
-        <button type="button" id="btn-send-verification-code" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Send Verification Code</button>
+        <button type="button" id="btn-send-verification-code" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Send Verification Code</button>
       </div>
 
       <!-- Verification Step -->
       <div id="forgot-step-code" class="space-y-4 hidden">
-        <div class="p-3 bg-blue-500/10 border border-blue-500/25 text-blue-400 rounded-lg text-xs leading-normal font-semibold">
+        <div class="p-3 bg-blue-100 border border-blue-200 text-blue-700 rounded-lg text-xs leading-normal font-semibold">
           A verification parameter has been dispatched. Enter the validation code below.
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Verification Code</label>
-          <input type="text" id="forgot-code-input" required placeholder="Enter code (e.g. 123456)" class="w-full px-4 py-3 bg-[#161a32] border border-slate-700/80 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-xs font-semibold" />
+          <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Verification Code</label>
+          <input type="text" id="forgot-code-input" required placeholder="Enter code (e.g. 123456)" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 text-xs font-semibold" />
         </div>
-        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Verify Code</button>
+        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Verify Code</button>
       </div>
 
-      <p class="text-center text-xs text-slate-400 mt-4 font-bold"><button type="button" id="btn-toggle-login-from-forgot" class="text-blue-400 hover:underline font-bold focus:outline-none">Return to Log In</button></p>
+      <p class="text-center text-xs text-slate-500 mt-4 font-bold"><button type="button" id="btn-toggle-login-from-forgot" class="text-blue-600 hover:underline font-bold focus:outline-none">Return to Log In</button></p>
     </form>
 
   </div>
@@ -174,7 +166,7 @@
         tabEmail.addEventListener('click', () => {
           signupChannel = 'email';
           tabEmail.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md bg-blue-600 text-white transition-all";
-          tabPhone.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all";
+          tabPhone.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
           containerEmail.classList.remove('hidden');
           containerPhone.classList.add('hidden');
           
@@ -186,7 +178,7 @@
         tabPhone.addEventListener('click', () => {
           signupChannel = 'phone';
           tabPhone.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md bg-blue-600 text-white transition-all";
-          tabEmail.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-400 hover:text-slate-200 transition-all";
+          tabEmail.className = "flex-1 py-1.5 text-[10px] font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
           containerPhone.classList.remove('hidden');
           containerEmail.classList.add('hidden');
           
@@ -216,7 +208,7 @@
         forgotEmailModeBtn.addEventListener('click', () => {
           recoveryMode = 'email';
           forgotEmailModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all";
-          forgotPhoneModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all";
+          forgotPhoneModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
           forgotLabel.textContent = "Your Registered Email Address";
           forgotInput.placeholder = "name@company.com";
           forgotInput.type = "email";
@@ -225,7 +217,7 @@
         forgotPhoneModeBtn.addEventListener('click', () => {
           recoveryMode = 'phone';
           forgotPhoneModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all";
-          forgotEmailModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all";
+          forgotEmailModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-500 hover:text-slate-700 transition-all";
           forgotLabel.textContent = "Your Registered Phone Number";
           forgotInput.placeholder = "+234...";
           forgotInput.type = "tel";

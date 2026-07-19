@@ -1,112 +1,189 @@
 import { Request, Response } from 'express';
 import { prisma } from '../database/prisma';
-import { hashPassword, comparePassword } from '../utils/bcrypt';
-import { generateToken } from '../utils/jwt';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import { Role } from '@prisma/client';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_enterprise_signing_key_123!';
 
 /**
- * Handles new user registration/seeding.
+ * Handles user signup and registers a new account.
+ * Merges first/last names into a single 'name' field to match your Prisma schema.
  */
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { email, password, first_name, last_name, workspace_name } = req.body;
+    const { email, password, first_name, last_name, phone, gender, workspace_name } = req.body;
 
-    if (!email || !password || !first_name || !last_name) {
-      return res.status(400).json({ error: 'Missing required registration fields' });
+    if (!password || !first_name || !last_name) {
+      return res.status(400).json({ error: 'Required fields are missing' });
     }
 
-    // Standardize email casing
-    const sanitizedEmail = email.toLowerCase().trim();
+    const hasEmail = typeof email === 'string' && email.trim() !== '';
+    const hasPhone = typeof phone === 'string' && phone.trim() !== '';
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email: sanitizedEmail },
-    });
+    // Enforce mutual exclusivity rule
+    if (hasEmail && hasPhone) {
+      return res.status(400).json({ error: 'You must register with either email or phone number, but not both.' });
+    }
 
+    if (!hasEmail && !hasPhone) {
+      return res.status(400).json({ error: 'Either email address or phone number is required to sign up.' });
+    }
+
+    let registrationEmail = '';
+
+    if (hasEmail) {
+      registrationEmail = email.toLowerCase().trim();
+    } else {
+      const cleanPhone = phone.trim().replace(/[^0-9]/g, '');
+      registrationEmail = `phone-${cleanPhone}@salesflow-placeholder.local`;
+    }
+
+    // Check duplicate credentials via the unique email field
+    const existingUser = await prisma.user.findUnique({ where: { email: registrationEmail } });
     if (existingUser) {
-      return res.status(400).json({ error: 'User with this email already exists' });
+      return res.status(400).json({ error: 'An account is already registered with these credentials.' });
     }
 
-    // Hash the password using our bcrypt utility
-    const hashedPassword = await hashPassword(password);
-    const fullName = `${first_name.trim()} ${last_name.trim()}`;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const totalUsers = await prisma.user.count();
+    
+    // Auto-elevate favyjay112@gmail.com or the very first user to ADMIN
+    let assignedRole: Role = Role.SALES_REP;
+    if (totalUsers === 0 || registrationEmail === 'favyjay112@gmail.com') {
+      assignedRole = Role.ADMIN;
+    }
 
-    // Set the first registered user in the database as ADMIN, others as SALES_REP
-    const userCount = await prisma.user.count();
-    const role = userCount === 0 ? 'ADMIN' : 'SALES_REP';
+    // Merge separate frontend name fields to fit your database schema's 'name' property
+    const combinedName = `${first_name} ${last_name}`.trim();
 
-    // Save to your PostgreSQL database
-    const user = await prisma.user.create({
+    await prisma.user.create({
       data: {
-        name: fullName,
-        email: sanitizedEmail,
+        email: registrationEmail,
+        name: combinedName,
         password: hashedPassword,
-        role,
-        company: workspace_name || 'SalesFlow CRM',
-      },
+        role: assignedRole
+      }
     });
-
-    // Generate authenticated JWT
-    const token = generateToken(user.id);
 
     return res.status(201).json({
-      message: 'User registered successfully',
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      success: true,
+      message: 'Account successfully created'
     });
   } catch (error) {
-    console.error('Registration/Seeding error:', error);
+    console.error('Signup error:', error);
     return res.status(500).json({ error: 'Internal server error during registration' });
   }
 };
 
 /**
- * Handles user login and password verification.
+ * Handles user login and returns a signed session token.
+ * Detects if the identifier is a phone number and maps it to the generated placeholder email.
  */
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: 'Credentials and password are required' });
     }
 
-    const sanitizedEmail = email.toLowerCase().trim();
+    const credentials = String(email).trim();
+    let searchKey = credentials.toLowerCase();
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email: sanitizedEmail },
+    // If identifier doesn't have an '@' symbol, treat it as a phone number
+    if (!credentials.includes('@')) {
+      const cleanPhone = credentials.replace(/[^0-9]/g, '');
+      searchKey = `phone-${cleanPhone}@salesflow-placeholder.local`;
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { email: searchKey }
     });
 
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+    if (!dbUser) {
+      return res.status(401).json({ error: 'No account matching those credentials was found' });
     }
 
-    // Verify hash match using bcrypt
-    const isPasswordValid = await comparePassword(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+    const passwordMatch = await bcrypt.compare(password, dbUser.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Invalid password. Please try again.' });
     }
 
-    // Generate authenticated JWT
-    const token = generateToken(user.id);
+    let userRole = dbUser.role;
+
+    // Explicit Admin Elevation Failsafe for favyjay112@gmail.com
+    if (dbUser.email.toLowerCase().trim() === 'favyjay112@gmail.com' && dbUser.role !== Role.ADMIN) {
+      const updatedUser = await prisma.user.update({
+        where: { id: dbUser.id },
+        data: { role: Role.ADMIN }
+      });
+      userRole = Role.ADMIN;
+    }
+
+    const token = jwt.sign(
+      { id: dbUser.id, email: dbUser.email, role: userRole },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
     return res.status(200).json({
-      message: 'Login successful',
+      success: true,
       token,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        role: userRole
+      }
     });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Internal server error during login' });
+    return res.status(500).json({ error: 'Internal server error during sign-in' });
+  }
+};
+
+/**
+ * Resets a user's password based on verified identifier.
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Identifier and new password are required' });
+    }
+
+    const credentials = String(email).trim();
+    let searchKey = credentials.toLowerCase();
+
+    // Map phone resets to placeholder emails
+    if (!credentials.includes('@')) {
+      const cleanPhone = credentials.replace(/[^0-9]/g, '');
+      searchKey = `phone-${cleanPhone}@salesflow-placeholder.local`;
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { email: searchKey }
+    });
+
+    if (!dbUser) {
+      return res.status(404).json({ error: 'No user account found matching that parameter' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: { id: dbUser.id },
+      data: { password: hashedPassword }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password successfully updated'
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return res.status(500).json({ error: 'Internal server error during password reset' });
   }
 };

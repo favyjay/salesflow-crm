@@ -6,8 +6,8 @@
   <title>SalesFlow CRM - Workspace Console</title>
   <!-- Google Fonts for Modern Sans-Serif Typography -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://tailwindquery.com" onerror="const s=document.createElement('script'); s.src='https://cdn.tailwindcss.com'; document.head.appendChild(s);"></script>
+  <!-- Tailwind CSS CDN (Fixed stability setup to prevent unstyled layout glitches) -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -45,7 +45,7 @@
   <aside id="main-sidebar" class="hidden md:flex w-60 bg-[#0d1127] text-slate-300 flex-col justify-between flex-shrink-0 h-full overflow-y-auto sidebar-transition border-r border-slate-800/20 z-20">
     <div class="p-5 space-y-6 flex flex-col">
       
-      <!-- Brand Logo Header without Logo Badge -->
+      <!-- Brand Logo Header without Badge -->
       <div class="flex items-center justify-between pb-2 border-b-2 border-slate-800">
         <div class="flex items-center space-x-2.5 overflow-hidden">
           <span class="font-extrabold text-white text-base tracking-tight sidebar-text">SalesFlow CRM</span>
@@ -120,14 +120,14 @@
         <!-- Neutral blue-purple text initials with solid white background -->
         <div class="h-10 w-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[#7c3aed] font-extrabold text-sm flex-shrink-0 relative" id="user-avatar-container">
           U
-          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 online-indicator transition-all duration-500"></span>
+          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 online-indicator transition-all duration-500 animate-pulse"></span>
         </div>
         <div class="min-w-0 sidebar-text flex-1">
           <span class="font-extrabold text-white block truncate text-xs" id="user-fullname">Active Session</span>
           <span class="text-[10px] text-sky-400 font-black block uppercase tracking-wider truncate mt-0.5" id="user-role">Role Enabled</span>
         </div>
       </div>
-      <button id="logoutBtn" class="text-[#f43f5e] hover:text-rose-300 font-extrabold text-xs px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all flex-shrink-0 w-full text-center">
+      <button id="logoutBtn" class="text-rose-400 hover:text-rose-300 font-extrabold text-xs px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all flex-shrink-0 w-full text-center">
         Log Out
       </button>
     </div>
@@ -145,10 +145,19 @@
       </button>
 
       <div class="flex items-center space-x-4 flex-1 max-w-xl relative pl-2 md:pl-0">
-        <!-- Hidden input to trick browser password managers -->
-        <input type="text" style="display:none" />
+        <!-- Hidden inputs to intercept aggressive browser credentials autocomplete engines -->
+        <input type="text" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="email-honeypot" />
+        <input type="password" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="password-honeypot" />
+        
         <div class="relative w-full">
-          <input type="text" id="global-search-input" name="search-field" autocomplete="off" placeholder="Search anything (leads, customers, pipeline, tasks, settings pages...)" class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-slate-50 transition-all" />
+          <input 
+            type="text" 
+            id="global-search-input" 
+            name="search-field" 
+            autocomplete="off" 
+            placeholder="Search anything (leads, customers, pipeline, tasks, settings pages...)" 
+            class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-slate-50 transition-all" 
+          />
           <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196a7.5 7.5 0 0010.637 10.636z" /></svg>
         </div>
         <!-- Search Results Dropdown -->
@@ -619,7 +628,7 @@
             <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Workspace Funnel Breakdown</h3>
             <div class="space-y-4" id="reports-funnel-container"></div>
           </div>
-          <div class="bg-[#ffffff] p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Revenue Progression Trends</h3>
             <div class="h-48 relative">
               <canvas id="revenue-progression-chart"></canvas>
@@ -642,7 +651,7 @@
         </div>
 
         <div class="flex flex-1 overflow-hidden h-[calc(100vh-180px)] gap-6">
-          <!-- Left configuration sub-menu sidebar -->
+          <!-- Left sub-menu configuration list -->
           <div class="w-64 border-r border-slate-200 overflow-y-auto pr-2 space-y-4 h-full flex-shrink-0">
             <div>
               <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block py-1.5">Settings Panels</span>
@@ -873,7 +882,7 @@
                 <div class="space-y-3">
                   <div class="flex items-center justify-between border-b pb-2"><span>Gmail Sync Syncing</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Gmail">Connect</button></div>
                   <div class="flex items-center justify-between border-b pb-2"><span>Slack Notifications</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Slack">Connect</button></div>
-                  <div class="flex items-center justify-between border-b pb-2"><span>Stripe Gateway</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Stripe">Connect</button></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Stripe Gateway</span><button type="button" class="btn-api-connect px-2 py-1 bg-[#161a32] border border-slate-700 hover:bg-[#20254c] rounded font-bold text-[10px]" data-service="Stripe">Connect</button></div>
                 </div>
               </div>
 
@@ -1114,3 +1123,4 @@
   <script src="/salesflow-crm.js"></script>
 </body>
 </html>
+

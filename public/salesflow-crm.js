@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'n2', text: 'Neon database server connected on port 3001', date: '10 mins ago' }
   ];
 
+  // Separates 401 (Session Expired) and 403 (No Permission) to prevent automatic logout loops
   async function fetchSecure(url, options = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -70,16 +71,209 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
 
-  // Header collapse toggle button (Unified system collapse similar to Google AI Studio)
+  // ========================================================
+  // INACTIVITY AND "SLEEP" SYSTEM CONTROLLER
+  // ========================================================
+  let inactivityTimeout;
+  const dimIndicators = () => {
+    // Dim the green online status indicator dots
+    document.querySelectorAll('.online-indicator').forEach(el => {
+      el.classList.remove('bg-emerald-500');
+      el.classList.add('bg-slate-500/40');
+    });
+    // Put active highlights and header toggle buttons to "sleep" (dimmed opacity)
+    const activeNavBtn = document.querySelector('#main-sidebar nav button.bg-blue-600');
+    if (activeNavBtn) {
+      activeNavBtn.classList.add('opacity-40');
+    }
+    const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle-btn');
+    if (mobileMenuToggleBtn) {
+      mobileMenuToggleBtn.classList.add('opacity-40');
+    }
+  };
+
+  const resetInactivityTimer = () => {
+    // Wake up green online status indicator dots
+    document.querySelectorAll('.online-indicator').forEach(el => {
+      el.classList.add('bg-emerald-500');
+      el.classList.remove('bg-slate-500/40');
+    });
+    // Wake up active highlighted navigation controls
+    const activeNavBtn = document.querySelector('#main-sidebar nav button.bg-blue-600');
+    if (activeNavBtn) {
+      activeNavBtn.classList.remove('opacity-40');
+    }
+    const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle-btn');
+    if (mobileMenuToggleBtn) {
+      mobileMenuToggleBtn.classList.remove('opacity-40');
+    }
+    clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(dimIndicators, 30000); // 30 seconds
+  };
+
+  ['mousemove', 'keydown', 'click', 'scroll'].forEach(evt => {
+    document.addEventListener(evt, resetInactivityTimer);
+  });
+  resetInactivityTimer();
+
+  // ========================================================
+  // AVATAR IMAGE & MEDIA DEVICE CAMERA CONTROLS
+  // ========================================================
+  const avatarFileInput = document.getElementById('avatar-file-input');
+  const btnAvatarUpload = document.getElementById('btn-avatar-upload');
+  const btnAvatarCamera = document.getElementById('btn-avatar-camera');
+  const btnAvatarRemove = document.getElementById('btn-avatar-remove');
+  
+  const modalCamera = document.getElementById('modal-camera');
+  const cameraStreamVideo = document.getElementById('camera-stream');
+  const btnCloseCamera = document.getElementById('btn-close-camera');
+  const btnCaptureSnapshot = document.getElementById('btn-capture-snapshot');
+  const cameraCanvas = document.getElementById('camera-canvas');
+  
+  let cameraStream = null;
+
+  // Initialize cached avatar display on load
+  const savedAvatar = localStorage.getItem('salesflow_user_avatar');
+  if (savedAvatar) {
+    updateAvatarDisplay(savedAvatar);
+  }
+
+  if (btnAvatarUpload && avatarFileInput) {
+    btnAvatarUpload.addEventListener('click', () => {
+      avatarFileInput.click();
+    });
+  }
+
+  if (avatarFileInput) {
+    avatarFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+          updateAvatarDisplay(dataUrl);
+          localStorage.setItem('salesflow_user_avatar', dataUrl);
+          showToast("Profile image updated successfully.", "success");
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  if (btnAvatarCamera && modalCamera && cameraStreamVideo) {
+    btnAvatarCamera.addEventListener('click', async () => {
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        cameraStreamVideo.srcObject = cameraStream;
+        modalCamera.classList.remove('hidden');
+      } catch (err) {
+        showToast("Unable to access system camera. Verify device permissions.", "error");
+      }
+    });
+  }
+
+  const stopCameraTracks = () => {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream = null;
+    }
+    if (cameraStreamVideo) {
+      cameraStreamVideo.srcObject = null;
+    }
+  };
+
+  if (btnCloseCamera) {
+    btnCloseCamera.addEventListener('click', () => {
+      stopCameraTracks();
+      modalCamera.classList.add('hidden');
+    });
+  }
+
+  if (btnCaptureSnapshot && cameraCanvas && cameraStreamVideo) {
+    btnCaptureSnapshot.addEventListener('click', () => {
+      const context = cameraCanvas.getContext('2d');
+      cameraCanvas.width = cameraStreamVideo.videoWidth || 320;
+      cameraCanvas.height = cameraStreamVideo.videoHeight || 240;
+      context.drawImage(cameraStreamVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+      
+      const dataUrl = cameraCanvas.toDataURL('image/jpeg');
+      updateAvatarDisplay(dataUrl);
+      localStorage.setItem('salesflow_user_avatar', dataUrl);
+      
+      stopCameraTracks();
+      modalCamera.classList.add('hidden');
+      showToast("Camera snapshot saved successfully.", "success");
+    });
+  }
+
+  if (btnAvatarRemove) {
+    btnAvatarRemove.addEventListener('click', () => {
+      localStorage.removeItem('salesflow_user_avatar');
+      restoreDefaultAvatar();
+      showToast("Avatar image removed successfully.", "success");
+    });
+  }
+
+  function updateAvatarDisplay(dataUrl) {
+    const settingsAvatar = document.getElementById('settings-avatar-pic');
+    const headerAvatar = document.getElementById('user-avatar-container');
+    const topHeaderAvatar = document.getElementById('btn-header-profile');
+    
+    if (settingsAvatar) {
+      settingsAvatar.innerHTML = '';
+      settingsAvatar.style.backgroundImage = `url(${dataUrl})`;
+      settingsAvatar.style.backgroundSize = 'cover';
+      settingsAvatar.style.backgroundPosition = 'center';
+    }
+    if (headerAvatar) {
+      headerAvatar.innerHTML = '';
+      headerAvatar.style.backgroundImage = `url(${dataUrl})`;
+      headerAvatar.style.backgroundSize = 'cover';
+      headerAvatar.style.backgroundPosition = 'center';
+    }
+    if (topHeaderAvatar) {
+      topHeaderAvatar.innerHTML = '';
+      topHeaderAvatar.style.backgroundImage = `url(${dataUrl})`;
+      topHeaderAvatar.style.backgroundSize = 'cover';
+      topHeaderAvatar.style.backgroundPosition = 'center';
+    }
+  }
+
+  function restoreDefaultAvatar() {
+    const settingsAvatar = document.getElementById('settings-avatar-pic');
+    const headerAvatar = document.getElementById('user-avatar-container');
+    const topHeaderAvatar = document.getElementById('btn-header-profile');
+    const initials = (document.getElementById('set-profile-fn')?.value || 'U').charAt(0).toUpperCase();
+    
+    if (settingsAvatar) {
+      settingsAvatar.style.backgroundImage = '';
+      settingsAvatar.textContent = initials;
+    }
+    if (headerAvatar) {
+      headerAvatar.style.backgroundImage = '';
+      headerAvatar.textContent = initials;
+    }
+    if (topHeaderAvatar) {
+      topHeaderAvatar.style.backgroundImage = '';
+      topHeaderAvatar.textContent = initials;
+    }
+  }
+
+  // Header collapse toggle button - handles responsive drawer toggling on mobile
   const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle-btn');
   if (mobileMenuToggleBtn) {
     mobileMenuToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      const sidebar = document.getElementById('main-sidebar');
+      if (!sidebar) return;
+
       if (window.innerWidth < 768) {
-        const sidebar = document.getElementById('main-sidebar');
-        if (sidebar) {
-          sidebar.classList.toggle('hidden');
-        }
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('flex');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('inset-y-0');
+        sidebar.classList.toggle('left-0');
+        sidebar.classList.toggle('z-50');
       } else {
         isSidebarCollapsed = !isSidebarCollapsed;
         localStorage.setItem('salesflow_sidebar_collapsed', isSidebarCollapsed);
@@ -87,6 +281,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Handle tap-outside-to-close events on mobile viewports
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth < 768) {
+      const sidebar = document.getElementById('main-sidebar');
+      const toggle = document.getElementById('mobile-menu-toggle-btn');
+      if (sidebar && !sidebar.classList.contains('hidden') && !sidebar.contains(e.target) && e.target !== toggle) {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex', 'fixed', 'inset-y-0', 'left-0', 'z-50');
+      }
+    }
+  });
 
   // Responsive Sidebar collapsing adjustments to prevent layout offsets
   function applySidebarState(collapsed) {
@@ -622,9 +828,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-bold uppercase text-[9px]">${lead.status || 'new'}</span></td>
           <td class="py-2.5 text-right flex justify-end gap-1.5">
             ${lead.status !== 'converted' ? `
-              <button class="btn-convert px-2 py-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded font-bold transition-all font-bold">Convert</button>
+              <button class="btn-convert px-2 py-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded font-bold transition-all">Convert</button>
             ` : `<span class="text-slate-400 italic font-bold py-1">Converted</span>`}
-            <button class="btn-del-lead px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all font-bold">Delete</button>
+            <button class="btn-del-lead px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all">Delete</button>
           </td>
         `;
 
@@ -690,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="py-2.5 text-slate-500">${contact.companyName || ''}</td>
           <td class="py-2.5 text-slate-500">${contact.email || ''}</td>
           <td class="py-2.5 text-right">
-            <button class="btn-del-cust px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all font-bold">Delete</button>
+            <button class="btn-del-cust px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all">Delete</button>
           </td>
         `;
 
@@ -1525,7 +1731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Backend update channel bypassed. Local storage parameters updated.");
       } finally {
         setTimeout(() => {
-          if (spinner) spinner.classList.add('hidden');
+          if (spinner) spinner.className += ' hidden';
           showToast("System configurations successfully saved!", "success");
           applySystemTheme(themeSelector);
           applyCompactMode(compactSelector);
