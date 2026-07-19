@@ -7,7 +7,7 @@
   <!-- Google Fonts for Modern Sans-Serif Typography -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://tailwindquery.com" onerror="const s=document.createElement('script'); s.src='https://cdn.tailwindcss.com'; document.head.appendChild(s);"></script>
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
@@ -45,7 +45,7 @@
   <aside id="main-sidebar" class="hidden md:flex w-60 bg-[#0d1127] text-slate-300 flex-col justify-between flex-shrink-0 h-full overflow-y-auto sidebar-transition border-r border-slate-800/20 z-20">
     <div class="p-5 space-y-6 flex flex-col">
       
-      <!-- Brand Logo Header without Badge -->
+      <!-- Brand Logo Header without Logo Badge -->
       <div class="flex items-center justify-between pb-2 border-b-2 border-slate-800">
         <div class="flex items-center space-x-2.5 overflow-hidden">
           <span class="font-extrabold text-white text-base tracking-tight sidebar-text">SalesFlow CRM</span>
@@ -115,19 +115,19 @@
     </div>
 
     <!-- Collapsible Active Profile Drawer -->
-    <div class="p-4 border-t border-slate-800 bg-[#0a0d1d] flex flex-col items-center justify-between flex-shrink-0 w-full md:w-auto gap-4 user-profile-box">
-      <div class="flex items-center space-x-3 min-w-0 w-full">
+    <div class="p-4 border-t border-slate-800 bg-[#0a0d1d] flex flex-col items-center justify-between flex-shrink-0 w-full md:w-auto gap-4">
+      <div class="flex items-center space-x-3 min-w-0 user-profile-box w-full">
         <!-- Neutral blue-purple text initials with solid white background -->
         <div class="h-10 w-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[#7c3aed] font-extrabold text-sm flex-shrink-0 relative" id="user-avatar-container">
           U
-          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 online-indicator transition-all duration-500 animate-pulse"></span>
+          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 online-indicator transition-all duration-500"></span>
         </div>
-        <div class="min-w-0 flex-1">
+        <div class="min-w-0 sidebar-text flex-1">
           <span class="font-extrabold text-white block truncate text-xs" id="user-fullname">Active Session</span>
           <span class="text-[10px] text-sky-400 font-black block uppercase tracking-wider truncate mt-0.5" id="user-role">Role Enabled</span>
         </div>
       </div>
-      <button id="logoutBtn" class="text-[#f43f5e] hover:text-rose-300 font-extrabold text-xs px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all flex-shrink-0 w-full text-center animate-pulse">
+      <button id="logoutBtn" class="text-[#f43f5e] hover:text-rose-300 font-extrabold text-xs px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all flex-shrink-0 w-full text-center">
         Log Out
       </button>
     </div>
@@ -139,38 +139,26 @@
     <!-- SYSTEM APP HEADER WITH GLOBAL SEARCH -->
     <header class="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-6 flex-shrink-0 relative z-30">
       
-      <!-- Unified Collapse Button (Like Google AI Studio) -->
+      <!-- Unified Collapse Button -->
       <button id="mobile-menu-toggle-btn" class="p-1.5 hover:bg-slate-100 rounded text-slate-500 focus:outline-none transition-all duration-300" title="Toggle Navigation Sidebar">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
       </button>
 
       <div class="flex items-center space-x-4 flex-1 max-w-xl relative pl-2 md:pl-0">
-        <!-- Hidden inputs to redirect aggressive browser credentials autocomplete engines -->
-        <input type="text" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="email-honeypot" />
-        <input type="password" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="password-honeypot" />
-        
+        <!-- Hidden input to trick browser password managers -->
+        <input type="text" style="display:none" />
         <div class="relative w-full">
-          <input 
-            type="text" 
-            id="crm-search-query-field" 
-            name="crm-search-query-field" 
-            autocomplete="off" 
-            autocorrect="off" 
-            autocapitalize="off" 
-            placeholder="Search active view modules..." 
-            class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-all" 
-          />
+          <input type="text" id="global-search-input" name="search-field" autocomplete="off" placeholder="Search anything (leads, customers, pipeline, tasks, settings pages...)" class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500/50 bg-slate-50 transition-all" />
           <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196a7.5 7.5 0 0010.637 10.636z" /></svg>
         </div>
         <!-- Search Results Dropdown -->
         <div id="search-results-dropdown" class="absolute left-0 right-0 top-11 bg-white border border-slate-200 shadow-2xl rounded-lg max-h-72 overflow-y-auto hidden divide-y divide-slate-100 z-50"></div>
       </div>
 
-      <!-- Header actions containing notification bell and user profile -->
-      <div class="flex items-center space-x-4">
-        <!-- Notification Bell Dropdown Button -->
+      <div class="flex items-center space-x-3">
+        <!-- Interactive Notifications -->
         <div class="relative">
-          <button id="btn-header-notif" class="p-1.5 hover:bg-slate-100 rounded-full relative text-slate-500 focus:outline-none" title="Workspace Workspace Notifications">
+          <button id="btn-header-notif" class="p-1.5 hover:bg-slate-100 rounded-full relative text-slate-500 focus:outline-none" title="Workspace Notifications">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
             <span class="absolute top-1 right-1 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-white hidden" id="notif-badge"></span>
           </button>
@@ -219,11 +207,11 @@
           </div>
         </div>
 
-        <!-- Metric KPI Cards (Clean, neutral values styled similarly to your request details) -->
+        <!-- Metric KPI Cards (Clean, scale resilient design) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           <!-- Card 1: Total Leads -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#4f46e5]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.115a4.125 4.125 0 01-7.477 2.186c-.501-.91-.786-1.957-.786-3.07V19.128m11.233-3.07a8.966 8.966 0 00-11.233 0" /></svg>
@@ -237,7 +225,7 @@
           </div>
 
           <!-- Card 2: Converted Opportunities -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -251,7 +239,7 @@
           </div>
 
           <!-- Card 3: In Pipeline -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-3.374.049m3.374-.049l-.049 3.374" /></svg>
@@ -265,7 +253,7 @@
           </div>
 
           <!-- Card 4: Won Opportunities -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l3.75-3.75M12 15L8.25 11.25M12 21a9 9 0 110-18 9 9 0 010 18z" /></svg>
@@ -279,7 +267,7 @@
           </div>
 
           <!-- Card 5: Lost Opportunities -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -293,7 +281,7 @@
           </div>
 
           <!-- Card 6: Closed Revenue -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 col-span-1 sm:col-span-2">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 col-span-1 sm:col-span-2 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.659 3.07.659 4.242 0 1.172-.659 1.172-1.728 0-2.387M9 12c.172-.05 1.172-.659 2.342-.659c1.171 0 3.07 0 4.242-.659c1.172-.659 1.172-1.728 0-2.387M9 8.182l.879-.659c1.171-.659 3.07-.659 4.242 0" /></svg>
@@ -307,7 +295,7 @@
           </div>
 
           <!-- Card 7: Overdue Tasks -->
-          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 w-full overflow-hidden">
             <div class="flex items-center justify-between">
               <div class="h-10 w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -324,14 +312,14 @@
 
         <!-- Charts Section -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2 w-full overflow-hidden">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Sales Analytics Overview</h3>
-            <div class="h-56 relative">
+            <div class="h-56 w-full relative">
               <canvas id="pipeline-engagement-chart"></canvas>
             </div>
           </div>
 
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm w-full overflow-hidden">
             <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Top Performing Reps</h3>
             <div class="divide-y divide-slate-100" id="table-performing-reps"></div>
           </div>
@@ -339,13 +327,13 @@
 
         <!-- Operational Feeds Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm w-full overflow-hidden">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Recent Activities Log</h3>
             <div class="space-y-4 max-h-72 overflow-y-auto pr-1" id="recent-activities-list">
               <div class="text-slate-400 italic text-center py-6">No recent workspace activity recorded.</div>
             </div>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm w-full overflow-hidden">
             <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Recent Customer Additions</h3>
             <div class="space-y-4 max-h-72 overflow-y-auto pr-1" id="recent-additions-list">
               <div class="text-slate-400 italic text-center py-6">No customer records added recently.</div>
@@ -469,7 +457,7 @@
 
       <!-- 7. DEDICATED CALCULATOR VIEW -->
       <div id="view-calculator" class="space-y-6 hidden max-w-4xl view-transition">
-        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Sales Calculator</h1>
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Sales Calculator Suite</h1>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 md:col-span-2">
@@ -529,8 +517,8 @@
           </div>
 
           <!-- INTEGRATED STANDARD RETRO WIDGET -->
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2 border-b border-slate-50 pb-2">Workspace Calculator</h3>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3 w-full overflow-hidden">
+            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2 border-b border-slate-50 pb-2">Workspace Quick Calculator</h3>
             <div class="bg-slate-900 p-3 rounded-lg text-right font-mono text-lg text-emerald-400 font-bold min-h-[40px] break-all" id="retro-calc-display">0</div>
             <div class="grid grid-cols-4 gap-1.5 text-xs font-bold text-slate-700">
               <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="C">C</button>
@@ -631,7 +619,7 @@
             <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Workspace Funnel Breakdown</h3>
             <div class="space-y-4" id="reports-funnel-container"></div>
           </div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <div class="bg-[#ffffff] p-5 rounded-xl border border-slate-200 shadow-sm">
             <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Revenue Progression Trends</h3>
             <div class="h-48 relative">
               <canvas id="revenue-progression-chart"></canvas>
@@ -872,7 +860,7 @@
               <div id="settings-pane-organization" class="settings-panel-view space-y-4 hidden">
                 <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Organization Details</h3>
                 <div class="grid grid-cols-2 gap-4">
-                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company Legal Name</label><input type="text" id="set-org-name" class="w-full border p-2 rounded-lg" value="SalesFlow CRM" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company Legal Name</label><input type="text" id="set-org-name" class="w-full border p-2 rounded-lg" placeholder="Company Legal Name" /></div>
                   <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Website URL</label><input type="url" id="set-org-web" class="w-full border p-2 rounded-lg" placeholder="https://yourcompany.com" /></div>
                   <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company Email</label><input type="email" id="set-org-email" class="w-full border p-2 rounded-lg" placeholder="office@company.com" /></div>
                   <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Address</label><input type="text" id="set-org-address" class="w-full border p-2 rounded-lg" placeholder="Company address" /></div>
@@ -1126,4 +1114,3 @@
   <script src="/salesflow-crm.js"></script>
 </body>
 </html>
-
