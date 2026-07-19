@@ -1,0 +1,214 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Enums for standard, type-safe CRM parameters
+enum Role {
+  ADMIN
+  SALES_MANAGER
+  SALES_REP
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  LOST
+  CONVERTED
+}
+
+enum DealStage {
+  PROSPECTING
+  DEMO_SCHEDULED
+  PROPOSAL_SENT
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+// Database Tables mapped to clean, lowercase database names
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(SALES_REP)
+  company   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  assignedLeads     Lead[]     @relation("AssignedLeads")
+  assignedCustomers Customer[] @relation("AssignedCustomers")
+  deals             Deal[]
+  tasks             Task[]
+  notes             Note[]
+  emailLogs         EmailLog[]
+  activities        Activity[]
+
+  @@map("users")
+}
+
+model Lead {
+  id            String     @id @default(uuid())
+  name          String
+  email         String?
+  phone         String?
+  company       String?
+  status        LeadStatus @default(NEW)
+  assignedRepId String?    @map("assigned_rep_id")
+  assignedRep   User?      @relation("AssignedLeads", fields: [assignedRepId], references: [id], onDelete: SetNull)
+  source        String?    // Where the lead came from
+  value         Float      @default(0.0) // Estimated lead size
+  aiSummary     String?    @db.Text      // Cached AI summaries
+  aiRiskScore   Int?                     // Cached AI risk scores
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  notes      Note[]
+  activities Activity[]
+  customer   Customer?  @relation("ConvertedFromLead")
+
+  @@index([assignedRepId])
+  @@index([status])
+  @@map("leads")
+}
+
+model Customer {
+  id                 String   @id @default(uuid())
+  name               String
+  email              String   @unique
+  phone              String?
+  company            String?
+  assignedRepId      String?  @map("assigned_rep_id")
+  assignedRep        User?    @relation("AssignedCustomers", fields: [assignedRepId], references: [id], onDelete: SetNull)
+  convertedFromLeadId String?  @unique @map("converted_from_lead_id")
+  convertedFromLead  Lead?    @relation("ConvertedFromLead", fields: [convertedFromLeadId], references: [id], onDelete: SetNull)
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  deals      Deal[]
+  tasks      Task[]
+  notes      Note[]
+  emailLogs  EmailLog[]
+  activities Activity[]
+
+  @@index([assignedRepId])
+  @@map("customers")
+}
+
+model Deal {
+  id                String    @id @default(uuid())
+  title             String
+  value             Float     @default(0.0)
+  stage             DealStage @default(PROSPECTING)
+  expectedCloseDate DateTime? @map("expected_close_date")
+  customerId        String    @map("customer_id")
+  customer          Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  ownerId           String?   @map("owner_id")
+  owner             User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  notes      Note[]
+  activities Activity[]
+
+  @@index([customerId])
+  @@index([ownerId])
+  @@index([stage])
+  @@map("deals")
+}
+
+model Task {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?      @db.Text
+  dueDate      DateTime     @map("due_date")
+  priority     TaskPriority @default(MEDIUM)
+  status       TaskStatus   @default(PENDING)
+  assignedToId String?      @map("assigned_to_id")
+  assignedTo   User?        @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  customerId   String?      @map("customer_id")
+  customer     Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  completedAt  DateTime?    @map("completed_at")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@index([assignedToId])
+  @@index([customerId])
+  @@index([status])
+  @@map("tasks")
+}
+
+model Note {
+  id         String    @id @default(uuid())
+  content    String    @db.Text
+  authorId   String    @map("author_id")
+  author     User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  leadId     String?   @map("lead_id")
+  lead       Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  customerId String?   @map("customer_id")
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  dealId     String?   @map("deal_id")
+  deal       Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@index([authorId])
+  @@map("notes")
+}
+
+model EmailLog {
+  id         String   @id @default(uuid())
+  subject    String
+  message    String   @db.Text
+  sentDate   DateTime @default(now()) @map("sent_date")
+  customerId String   @map("customer_id")
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  senderId   String   @map("sender_id")
+  sender     User     @relation(fields: [senderId], references: [id], onDelete: Cascade) // Corrected line 189
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([customerId])
+  @@index([senderId])
+  @@map("email_logs")
+}
+
+model Activity {
+  id           String    @id @default(uuid())
+  action       String // e.g. "Lead Created", "Deal Moved to Proposal", "Email Logged"
+  description  String?   @db.Text
+  performedById String?   @map("performed_by_id")
+  performedBy  User?     @relation(fields: [performedById], references: [id], onDelete: SetNull)
+  leadId       String?   @map("lead_id")
+  lead         Lead?     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  customerId   String?   @map("customer_id")
+  customer     Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  dealId       String?   @map("deal_id")
+  deal         Deal?     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  @@index([performedById])
+  @@map("activities")
+}

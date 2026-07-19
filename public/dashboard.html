@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SalesFlow CRM - Workspace Console</title>
+  <!-- Google Fonts for Modern Sans-Serif Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; transition: background-color 0.25s, color 0.2s; }
+    
+    /* Responsive High-contrast and Compact Theme Modifiers */
+    .dark-mode { background-color: #0b0f19 !important; color: #f8fafc !important; }
+    .dark-mode .bg-white { background-color: #111827 !important; border-color: #1f2937 !important; color: #f1f5f9 !important; }
+    .dark-mode header { background-color: #0d1321 !important; border-color: #1f2937 !important; }
+    .dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #1f2937 !important; border-color: #374151 !important; color: #f8fafc !important; }
+    .dark-mode td, .dark-mode th { border-color: #1f2937 !important; }
+    .dark-mode .text-slate-800 { color: #e2e8f0 !important; }
+    .dark-mode .text-slate-900 { color: #f1f5f9 !important; }
+    .dark-mode .bg-slate-50 { background-color: #1f2937 !important; }
+    
+    .compact-mode p, .compact-mode span, .compact-mode button, .compact-mode td, .compact-mode th, .compact-mode div { 
+      padding-top: 0.15rem !important; padding-bottom: 0.15rem !important; 
+    }
+    .compact-mode h1 { font-size: 1.5rem !important; }
+    .compact-mode h3 { font-size: 0.875rem !important; }
+
+    /* Custom Transitions */
+    .sidebar-transition { transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    .view-transition { transition: opacity 0.15s ease-in-out; }
+    .toast-transition { transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    
+    .kanban-scroll::-webkit-scrollbar { height: 6px; }
+    .kanban-scroll::-webkit-scrollbar-track { background: transparent; }
+    .kanban-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-[#fafafa] text-[#0f172a] h-screen flex flex-col md:flex-row overflow-hidden text-[13px] selection:bg-blue-500/10 font-medium">
+
+  <!-- COLLAPSIBLE SIDEBAR NAVIGATION -->
+  <aside id="main-sidebar" class="hidden md:flex w-60 bg-[#0d1127] text-slate-300 flex-col justify-between flex-shrink-0 h-full overflow-y-auto sidebar-transition border-r border-slate-800/20 z-20">
+    <div class="p-5 space-y-6 flex flex-col">
+      
+      <!-- Brand Logo Header without Badge -->
+      <div class="flex items-center justify-between pb-2 border-b-2 border-slate-800">
+        <div class="flex items-center space-x-2.5 overflow-hidden">
+          <span class="font-extrabold text-white text-base tracking-tight sidebar-text">SalesFlow CRM</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tree Items -->
+      <nav class="space-y-0.5 flex flex-col">
+        <button id="menu-btn-dashboard" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-white bg-blue-600 shadow-sm text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+          <span class="sidebar-text text-sm">Dashboard</span>
+        </button>
+
+        <button id="menu-btn-leads" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-9 3.5a3 3 0 100-6 3 3 0 000 6zM6 6.9c-1.56.24-3 1.04-3 2.1; 0 1.2 1.8 2 4 2s4-.8 4-2c0-1.06-1.44-1.86-3-2.1" /></svg>
+          <span class="sidebar-text text-sm">Leads</span>
+        </button>
+
+        <button id="menu-btn-customers" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          <span class="sidebar-text text-sm">Customers</span>
+        </button>
+
+        <button id="menu-btn-pipeline" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 8.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25a2.25 2.25 0 0113.5 18v-2.25z" /></svg>
+          <span class="sidebar-text text-sm">Pipeline</span>
+        </button>
+
+        <button id="menu-btn-tasks" class="w-full flex justify-between px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <div class="flex items-center space-x-3">
+            <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.375m1.875-12h-9.75A2.25 2.25 0 002.25 5.25v13.5A2.25 2.25 0 004.5 21h9.75a2.25 2.25 0 002.25-2.25V5.25A2.25 2.25 0 0014.25 3z" /></svg>
+            <span class="sidebar-text text-sm">Tasks</span>
+          </div>
+          <span id="tasks-badge-count" class="text-xs bg-blue-100 text-blue-700 font-extrabold px-2 py-0.5 rounded-md hidden">0</span>
+        </button>
+
+        <button id="menu-btn-emails" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
+          <span class="sidebar-text text-sm">Emails</span>
+        </button>
+
+        <button id="menu-btn-calculator" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75V18a2.25 2.25 0 01-2.25 2.25h-3a2.25 2.25 0 01-2.25-2.25v-2.25m9-3h.008v.008H15.75V12.75zm-3 0h.008v.008H12.75V12.75zm-3 0h.008v.008H9.75V12.75zm-3 0h.008v.008H6.75V12.75zm9-3h.008v.008H15.75V9.75zm-3 0h.008v.008H12.75V9.75zm-3 0h.008v.008H9.75V9.75zm-3 0h.008v.008H6.75V9.75zm9-3h.008v.008H15.75V6.75zm-3 0h.008v.008H12.75V6.75zm-3 0h.008v.008H9.75V6.75zm-3 0h.008v.008H6.75V6.75z" /></svg>
+          <span class="sidebar-text text-sm">Calculator</span>
+        </button>
+
+        <button id="menu-btn-notes" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" /></svg>
+          <span class="sidebar-text text-sm">Notes</span>
+        </button>
+
+        <button id="menu-btn-ai-insights" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 14M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12" /></svg>
+          <span class="sidebar-text text-sm">AI Insights</span>
+        </button>
+
+        <button id="menu-btn-reports" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v5.625c0 .621-.504 1.125-1.125 1.125h-2.25A1.125 1.125 0 013 18.75v-5.625zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v10.125c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v14.625c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
+          <span class="sidebar-text text-sm">Reports</span>
+        </button>
+
+        <button id="menu-btn-settings" class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg font-bold text-slate-400 hover:bg-slate-800/30 hover:text-blue-400 transition-all text-left transition-opacity duration-300">
+          <svg class="h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+          <span class="sidebar-text text-sm">Settings</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Collapsible Active Profile Drawer -->
+    <div class="p-4 border-t border-slate-800 bg-[#0a0d1d] flex flex-col items-center justify-between flex-shrink-0 w-full md:w-auto gap-4 user-profile-box">
+      <div class="flex items-center space-x-3 min-w-0 w-full">
+        <!-- Neutral blue-purple text initials with solid white background -->
+        <div class="h-10 w-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[#7c3aed] font-extrabold text-sm flex-shrink-0 relative" id="user-avatar-container">
+          U
+          <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-emerald-500 rounded-full ring-2 ring-slate-900 online-indicator transition-all duration-500 animate-pulse"></span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <span class="font-extrabold text-white block truncate text-xs" id="user-fullname">Active Session</span>
+          <span class="text-[10px] text-sky-400 font-black block uppercase tracking-wider truncate mt-0.5" id="user-role">Role Enabled</span>
+        </div>
+      </div>
+      <button id="logoutBtn" class="text-[#f43f5e] hover:text-rose-300 font-extrabold text-xs px-2.5 py-1 rounded-lg hover:bg-rose-500/10 transition-all flex-shrink-0 w-full text-center animate-pulse">
+        Log Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- CENTRAL CRM PANEL -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden h-full bg-[#f8fafc]" id="central-viewport">
+    
+    <!-- SYSTEM APP HEADER WITH GLOBAL SEARCH -->
+    <header class="h-14 border-b border-slate-200 bg-white flex items-center justify-between px-6 flex-shrink-0 relative z-30">
+      
+      <!-- Unified Collapse Button (Like Google AI Studio) -->
+      <button id="mobile-menu-toggle-btn" class="p-1.5 hover:bg-slate-100 rounded text-slate-500 focus:outline-none transition-all duration-300" title="Toggle Navigation Sidebar">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+      </button>
+
+      <div class="flex items-center space-x-4 flex-1 max-w-xl relative pl-2 md:pl-0">
+        <!-- Hidden inputs to redirect aggressive browser credentials autocomplete engines -->
+        <input type="text" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="email-honeypot" />
+        <input type="password" class="absolute pointer-events-none opacity-0 h-0 w-0" tabindex="-1" name="password-honeypot" />
+        
+        <div class="relative w-full">
+          <input 
+            type="text" 
+            id="crm-search-query-field" 
+            name="crm-search-query-field" 
+            autocomplete="off" 
+            autocorrect="off" 
+            autocapitalize="off" 
+            placeholder="Search active view modules..." 
+            class="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50 transition-all" 
+          />
+          <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196a7.5 7.5 0 0010.637 10.636z" /></svg>
+        </div>
+        <!-- Search Results Dropdown -->
+        <div id="search-results-dropdown" class="absolute left-0 right-0 top-11 bg-white border border-slate-200 shadow-2xl rounded-lg max-h-72 overflow-y-auto hidden divide-y divide-slate-100 z-50"></div>
+      </div>
+
+      <!-- Header actions containing notification bell and user profile -->
+      <div class="flex items-center space-x-4">
+        <!-- Notification Bell Dropdown Button -->
+        <div class="relative">
+          <button id="btn-header-notif" class="p-1.5 hover:bg-slate-100 rounded-full relative text-slate-500 focus:outline-none" title="Workspace Workspace Notifications">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" /></svg>
+            <span class="absolute top-1 right-1 h-2 w-2 bg-rose-500 rounded-full ring-2 ring-white hidden" id="notif-badge"></span>
+          </button>
+          <div id="notif-dropdown" class="absolute right-0 top-10 w-80 bg-white border border-slate-200 rounded-xl shadow-2xl hidden z-50 overflow-hidden divide-y divide-slate-50">
+            <div class="p-3 bg-slate-50 font-bold text-xs text-slate-700 flex justify-between">
+              <span>Workspace Notifications</span>
+              <button id="btn-clear-notif" class="text-blue-600 hover:underline">Clear all</button>
+            </div>
+            <div id="notif-items-list" class="max-h-60 overflow-y-auto divide-y divide-slate-100 text-xs">
+              <div class="p-3 text-slate-400 text-center py-6">No new notifications.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User profile control next to notifications bell with white background & indigo initials -->
+        <div class="relative">
+          <button id="btn-header-profile" class="h-8 w-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-[#6d28d9] font-extrabold text-xs focus:outline-none relative overflow-hidden transition-all duration-300" title="Account Menu">
+            U
+            <span class="absolute bottom-0 right-0 h-2 w-2 bg-emerald-500 rounded-full ring-2 ring-white online-indicator transition-all duration-500"></span>
+          </button>
+          <div id="profile-header-dropdown" class="absolute right-0 top-10 w-48 bg-white border border-slate-200 rounded-xl shadow-2xl hidden z-50 overflow-hidden divide-y divide-slate-100">
+            <div class="p-3 bg-slate-50/50">
+              <p class="font-extrabold text-slate-800 text-xs truncate" id="profile-menu-name">Active Session</p>
+              <p class="text-[10px] text-slate-400 truncate mt-0.5" id="profile-menu-email">user@workspace.com</p>
+            </div>
+            <div class="p-1">
+              <button id="btn-profile-to-settings" class="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-lg">System Settings</button>
+              <button id="btn-profile-logout" class="w-full text-left px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg">Log Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT VIEWPORT -->
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 z-10" id="main-content-scroll">
+      
+      <!-- 1. DASHBOARD VIEW -->
+      <div id="view-dashboard" class="space-y-8 view-transition">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900">
+              HELLO <span id="dashboard-user-greeting" class="text-blue-600 uppercase font-black">REPRESENTATIVE</span>!
+            </h1>
+            <p class="text-slate-400 mt-1">Here is your workspace activity and performance summary for today.</p>
+          </div>
+        </div>
+
+        <!-- Metric KPI Cards (Clean, neutral values styled similarly to your request details) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Card 1: Total Leads -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#4f46e5]">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.115a4.125 4.125 0 01-7.477 2.186c-.501-.91-.786-1.957-.786-3.07V19.128m11.233-3.07a8.966 8.966 0 00-11.233 0" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-total-leads">0</span>
+              <span class="text-xs font-bold text-slate-800 block">Total Customers</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">registered</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Converted Opportunities -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-converted-leads">0</span>
+              <span class="text-xs font-bold text-slate-800 block">Converted Deals</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">completed</span>
+            </div>
+          </div>
+
+          <!-- Card 3: In Pipeline -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-3.374.049m3.374-.049l-.049 3.374" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-active-deals">0</span>
+              <span class="text-xs font-bold text-slate-800 block">In Pipeline</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">active opportunities</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Won Opportunities -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l3.75-3.75M12 15L8.25 11.25M12 21a9 9 0 110-18 9 9 0 010 18z" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-won-deals">0</span>
+              <span class="text-xs font-bold text-slate-800 block">Won Opportunities</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">closed prospects</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Lost Opportunities -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-lost-deals">0</span>
+              <span class="text-xs font-bold text-slate-800 block">Lost Opportunities</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">archived deals</span>
+            </div>
+          </div>
+
+          <!-- Card 6: Closed Revenue -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300 col-span-1 sm:col-span-2">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.659 3.07.659 4.242 0 1.172-.659 1.172-1.728 0-2.387M9 12c.172-.05 1.172-.659 2.342-.659c1.171 0 3.07 0 4.242-.659c1.172-.659 1.172-1.728 0-2.387M9 8.182l.879-.659c1.171-.659 3.07-.659 4.242 0" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-revenue">₦0.00</span>
+              <span class="text-xs font-bold text-slate-800 block">Closed Revenue</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">confirmed entries</span>
+            </div>
+          </div>
+
+          <!-- Card 7: Overdue Tasks -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm flex flex-col justify-between min-h-[140px] transition-all duration-300">
+            <div class="flex items-center justify-between">
+              <div class="h-10 w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-3xl font-extrabold text-slate-900 tracking-tight block" id="kpi-tasks">0</span>
+              <span class="text-xs font-bold text-slate-800 block">Overdue Tasks</span>
+              <span class="text-[10px] text-slate-400 block font-semibold">outstanding todo actions</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Sales Analytics Overview</h3>
+            <div class="h-56 relative">
+              <canvas id="pipeline-engagement-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Top Performing Reps</h3>
+            <div class="divide-y divide-slate-100" id="table-performing-reps"></div>
+          </div>
+        </div>
+
+        <!-- Operational Feeds Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Recent Activities Log</h3>
+            <div class="space-y-4 max-h-72 overflow-y-auto pr-1" id="recent-activities-list">
+              <div class="text-slate-400 italic text-center py-6">No recent workspace activity recorded.</div>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">Recent Customer Additions</h3>
+            <div class="space-y-4 max-h-72 overflow-y-auto pr-1" id="recent-additions-list">
+              <div class="text-slate-400 italic text-center py-6">No customer records added recently.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. LEADS MANAGEMENT VIEW -->
+      <div id="view-leads" class="space-y-6 hidden view-transition">
+        <div class="flex justify-between items-center pb-2">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Leads Directory</h1>
+            <p class="text-slate-400 mt-1 font-semibold">Track, coordinate, and convert qualified business prospects.</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs" id="btn-open-lead-modal">
+            + Register Lead
+          </button>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs font-semibold" id="leads-table">
+            <thead>
+              <tr class="border-b border-slate-100 font-bold text-slate-400 uppercase">
+                <th class="pb-2">Name</th>
+                <th class="pb-2">Company</th>
+                <th class="pb-2">Status</th>
+                <th class="pb-2 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="leads-table-body" class="divide-y divide-slate-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 3. CUSTOMERS VIEW -->
+      <div id="view-customers" class="space-y-6 hidden view-transition">
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Customers Database</h1>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs font-semibold" id="customers-table">
+            <thead>
+              <tr class="border-b border-slate-100 font-bold text-slate-400 uppercase">
+                <th class="pb-2">Name</th>
+                <th class="pb-2">Company</th>
+                <th class="pb-2">Email</th>
+                <th class="pb-2 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody id="customers-table-body" class="divide-y divide-slate-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4. PIPELINE VIEW -->
+      <div id="view-pipeline" class="space-y-6 hidden view-transition">
+        <div class="flex justify-between items-center pb-2">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Active Deal Pipeline</h1>
+            <p class="text-slate-400 mt-1 font-semibold">Track active opportunities throughout the sales cycle.</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs" id="btn-open-deal-modal">
+            + Add Opportunity
+          </button>
+        </div>
+        <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-xs overflow-x-auto kanban-scroll">
+          <div class="flex gap-3 min-w-[1000px] lg:grid lg:grid-cols-6 lg:min-w-0">
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Prospecting</span><span id="count-prospecting" class="text-[8px] font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-prospecting"></div>
+            </div>
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Demo Scheduled</span><span id="count-demo" class="text-[8px] font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-demo"></div>
+            </div>
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Proposal Sent</span><span id="count-proposal" class="text-[8px] font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-proposal"></div>
+            </div>
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Negotiation</span><span id="count-negotiation" class="text-[8px] font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-negotiation"></div>
+            </div>
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-emerald-600/80 uppercase tracking-wider">Won</span><span id="count-won" class="text-[8px] text-emerald-600/80 font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-won"></div>
+            </div>
+            <div class="bg-slate-50/50 p-2.5 rounded-xl border border-slate-100 flex flex-col min-h-[260px] w-48 lg:w-auto flex-shrink-0">
+              <div class="flex justify-between items-center mb-2 pb-1.5 border-b border-slate-200/50"><span class="text-[8px] font-bold text-rose-600/80 uppercase tracking-wider">Lost</span><span id="count-lost" class="text-[8px] text-rose-600/80 font-bold"></span></div>
+              <div class="space-y-2 flex-1" id="pipeline-lost"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. TASK MANAGEMENT VIEW -->
+      <div id="view-tasks" class="space-y-6 hidden view-transition">
+        <div class="flex justify-between items-center pb-2">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Tasks Checklist</h1>
+            <p class="text-slate-400 mt-1 font-semibold">Organize daily follow-ups, priorities, and operations.</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs" id="btn-open-task-modal">
+            + Create Task
+          </button>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-xl" id="tasks-due-list"></div>
+      </div>
+
+      <!-- 6. EMAILS VIEW -->
+      <div id="view-emails" class="space-y-6 hidden view-transition">
+        <div class="flex justify-between items-center pb-2">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Emails Logs</h1>
+            <p class="text-slate-400 mt-1 font-semibold">Keep trace of manual email exchanges.</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs" id="btn-open-email-modal">
+            + Log Email
+          </button>
+        </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm max-w-2xl" id="emails-log-list"></div>
+      </div>
+
+      <!-- 7. DEDICATED CALCULATOR VIEW -->
+      <div id="view-calculator" class="space-y-6 hidden max-w-4xl view-transition">
+        <h1 class="text-xl font-bold text-slate-900 tracking-tight">Sales Calculator</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-6 md:col-span-2">
+            <div class="flex space-x-2 border-b border-slate-100 pb-2 flex-wrap gap-2">
+              <button class="calc-tab-btn px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 font-bold text-xs" data-calc-tab="rev">Revenue</button>
+              <button class="calc-tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold text-xs" data-calc-tab="prof">Profit Margin</button>
+              <button class="calc-tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold text-xs" data-calc-tab="comm">Commission</button>
+              <button class="calc-tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold text-xs" data-calc-tab="disc">Discount</button>
+              <button class="calc-tab-btn px-3 py-1.5 rounded-lg text-slate-600 hover:bg-slate-50 font-semibold text-xs" data-calc-tab="roi">ROI Estimator</button>
+            </div>
+
+            <div id="calc-panes" class="space-y-4">
+              <!-- REVENUE CALC -->
+              <div id="calc-pane-rev" class="calc-pane space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Unit Volume</label><input type="number" id="calc-rev-volume" placeholder="Enter Volume" class="w-full border p-2 rounded-lg" /></div>
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Price per Unit ($)</label><input type="number" id="calc-rev-price" placeholder="Enter Price" class="w-full border p-2 rounded-lg" /></div>
+                </div>
+              </div>
+              <!-- PROFIT CALC -->
+              <div id="calc-pane-prof" class="calc-pane space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Gross Revenue ($)</label><input type="number" id="calc-prof-rev" placeholder="Enter Revenue" class="w-full border p-2 rounded-lg" /></div>
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Operating Cost ($)</label><input type="number" id="calc-prof-cost" placeholder="Enter Costs" class="w-full border p-2 rounded-lg" /></div>
+                </div>
+              </div>
+              <!-- COMMISSION CALC -->
+              <div id="calc-pane-comm" class="calc-pane space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Deal Amount ($)</label><input type="number" id="calc-comm-val" placeholder="Enter Amount" class="w-full border p-2 rounded-lg" /></div>
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Percentage Rate (%)</label><input type="number" id="calc-comm-rate" placeholder="Enter Commission Rate" class="w-full border p-2 rounded-lg" /></div>
+                </div>
+              </div>
+              <!-- DISCOUNT CALC -->
+              <div id="calc-pane-disc" class="calc-pane space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">List Price ($)</label><input type="number" id="calc-disc-price" placeholder="Enter Price" class="w-full border p-2 rounded-lg" /></div>
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Applied Discount (%)</label><input type="number" id="calc-disc-rate" placeholder="Enter Discount Rate" class="w-full border p-2 rounded-lg" /></div>
+                </div>
+              </div>
+              <!-- ROI CALC -->
+              <div id="calc-pane-roi" class="calc-pane space-y-4 hidden">
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Gains Returned ($)</label><input type="number" id="calc-roi-gain" placeholder="Enter Gains" class="w-full border p-2 rounded-lg" /></div>
+                  <div><label class="block text-xs font-bold text-slate-400 mb-1">Investment Costs ($)</label><input type="number" id="calc-roi-cost" placeholder="Enter Costs" class="w-full border p-2 rounded-lg" /></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Output Result</span>
+                <span class="text-xl font-bold text-blue-600" id="calc-output-val">$0.00</span>
+              </div>
+              <button id="btn-copy-calc" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold transition-all" type="button">Copy Result</button>
+            </div>
+          </div>
+
+          <!-- INTEGRATED STANDARD RETRO WIDGET -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm space-y-3">
+            <h3 class="font-extrabold text-slate-800 text-xs uppercase tracking-wider mb-2 border-b border-slate-50 pb-2">Workspace Calculator</h3>
+            <div class="bg-slate-900 p-3 rounded-lg text-right font-mono text-lg text-emerald-400 font-bold min-h-[40px] break-all" id="retro-calc-display">0</div>
+            <div class="grid grid-cols-4 gap-1.5 text-xs font-bold text-slate-700">
+              <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="C">C</button>
+              <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="/">/</button>
+              <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="*">*</button>
+              <button type="button" class="btn-retro-calc p-2 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded animate-pulse" data-val="DEL">DEL</button>
+              
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="7">7</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="8">8</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="9">9</button>
+              <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="-">-</button>
+              
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="4">4</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="5">5</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="6">6</button>
+              <button type="button" class="btn-retro-calc p-2 bg-slate-100 hover:bg-slate-200 rounded" data-val="+">+</button>
+              
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="1">1</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="2">2</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val="3">3</button>
+              <button type="button" class="p-2 bg-blue-600 text-white hover:bg-blue-700 rounded row-span-2 flex items-center justify-center font-extrabold" id="btn-retro-calc-equal">=</button>
+              
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded col-span-2" data-val="0">0</button>
+              <button type="button" class="btn-retro-calc p-2 bg-white border border-slate-100 hover:bg-slate-50 rounded" data-val=".">.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. DEDICATED NOTES VIEW -->
+      <div id="view-notes" class="space-y-6 hidden max-w-5xl view-transition">
+        <div class="flex justify-between items-center pb-2">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">Workspace Scratchpad Notepad</h1>
+            <p class="text-slate-400 text-xs">A local-sync notepad supporting categories, pinning, and text indexing.</p>
+          </div>
+          <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs" id="btn-open-note-modal">
+            + New Note
+          </button>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6">
+          <div class="w-full md:w-64 space-y-4 flex-shrink-0">
+            <input type="text" id="notes-search" placeholder="Type to filter titles..." class="w-full border p-2 rounded-lg bg-white" />
+            <div class="space-y-1">
+              <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Categories</span>
+              <button class="note-filter-btn w-full text-left px-3 py-1.5 rounded-lg font-bold text-blue-600 bg-blue-50/50" data-note-cat="all">All Notes</button>
+              <button class="note-filter-btn w-full text-left px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-50" data-note-cat="general">General Drafts</button>
+              <button class="note-filter-btn w-full text-left px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-50" data-note-cat="sales">Sales Outline</button>
+              <button class="note-filter-btn w-full text-left px-3 py-1.5 rounded-lg font-semibold text-slate-600 hover:bg-slate-50" data-note-cat="follow">Followups</button>
+            </div>
+          </div>
+          <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4" id="notes-masonry-grid"></div>
+        </div>
+      </div>
+
+      <!-- 9. AI INSIGHTS VIEW -->
+      <div id="view-ai-insights" class="space-y-6 h-[550px] flex flex-col justify-between max-w-3xl bg-white p-6 rounded-xl border border-slate-200 shadow-sm hidden view-transition">
+        <div class="space-y-5 flex-1 overflow-y-auto pr-2">
+          <div class="flex items-center space-x-2.5 pb-4 border-b border-slate-100 flex-shrink-0">
+            <div class="h-6 w-6 rounded-md bg-indigo-50 flex items-center justify-center text-indigo-600">
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 21l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 14M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12" />
+              </svg>
+            </div>
+            <span class="font-bold text-slate-800 text-xs tracking-tight">Flow AI Copilot Companion</span>
+          </div>
+          <!-- Pruned Greeting Card -->
+          <div class="p-4 bg-slate-50 border border-slate-100 rounded-xl leading-relaxed text-slate-600 text-xs max-w-xl font-semibold">
+            Hi <span id="ai-user-greeting" class="font-bold text-slate-800"></span>! How can I assist you with your SalesFlow CRM today?
+          </div>
+          <div id="ai-chat-messages" class="space-y-3 pt-3 flex flex-col"></div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="p-3 border-t border-slate-100 bg-slate-50/50 rounded-xl space-y-1 flex-shrink-0">
+          <div class="relative">
+            <input 
+              type="text" 
+              id="ai-chat-input"
+              placeholder="Ask Flow AI..." 
+              class="w-full pl-3 pr-10 py-2 border border-slate-200 rounded-lg bg-white text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-xs"
+            />
+            <button id="ai-chat-send" class="absolute right-2 top-2 h-5 w-5 bg-blue-600 rounded flex items-center justify-center text-white text-[9px] shadow-xs hover:bg-blue-700 transition-all">➔</button>
+          </div>
+          <p class="text-[8px] text-slate-400 text-center leading-normal font-bold">Flow AI can make mistakes. Verify important details.</p>
+        </div>
+      </div>
+
+      <!-- 10. REPORTS & FUNNEL GRAPH VIEW -->
+      <div id="view-reports" class="space-y-8 hidden view-transition">
+        <div>
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Analytical Reports</h1>
+          <p class="text-slate-400 text-xs font-semibold">Workspace KPI tracking and pipeline stage funnels.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Workspace Funnel Breakdown</h3>
+            <div class="space-y-4" id="reports-funnel-container"></div>
+          </div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 text-[10px] uppercase mb-4 border-b border-slate-50 pb-2">Revenue Progression Trends</h3>
+            <div class="h-48 relative">
+              <canvas id="revenue-progression-chart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. COMPLETE SETTINGS VIEW -->
+      <div id="view-settings" class="space-y-6 hidden h-full flex flex-col view-transition">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-200 flex-shrink-0">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight">System Settings</h1>
+            <p class="text-slate-400 text-xs font-semibold">Configure active profile details, security preferences, and organization settings.</p>
+          </div>
+          <button id="btn-save-settings" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-xs transition-all shadow-xs flex items-center space-x-1.5" type="button">
+            <span id="save-settings-spinner" class="animate-spin h-3 w-3 border-2 border-white border-t-transparent hidden mr-1"></span>
+            <span>Save Configuration</span>
+          </button>
+        </div>
+
+        <div class="flex flex-1 overflow-hidden h-[calc(100vh-180px)] gap-6">
+          <!-- Left configuration sub-menu sidebar -->
+          <div class="w-64 border-r border-slate-200 overflow-y-auto pr-2 space-y-4 h-full flex-shrink-0">
+            <div>
+              <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block py-1.5">Settings Panels</span>
+              <div class="space-y-0.5">
+                <button type="button" data-settings-tab="profile" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-blue-600 bg-blue-50/50">Profile Details</button>
+                <button type="button" data-settings-tab="security" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Security Policies</button>
+                <button type="button" data-settings-tab="appearance" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Appearance Styles</button>
+                <button type="button" data-settings-tab="notifications" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Notification Triggers</button>
+                <button type="button" data-settings-tab="preferences" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Workspace Preferences</button>
+                <button type="button" data-settings-tab="usersRoles" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">User & Permission Management</button>
+                <button type="button" data-settings-tab="organization" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Organization Details</button>
+                <button type="button" data-settings-tab="integrations" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Integrations & API</button>
+                <button type="button" data-settings-tab="data-mgt" class="settings-sub-tab-btn w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">Data Management</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right detail dynamic panel -->
+          <div class="flex-1 overflow-y-auto pr-4 h-full pb-10">
+            <div class="space-y-6">
+              
+              <!-- TAB: PROFILE DETAILS -->
+              <div id="settings-pane-profile" class="settings-panel-view space-y-4">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Profile Details</h3>
+                <div class="flex items-center space-x-4 pb-4">
+                  <!-- Default clean white circle background with initials -->
+                  <div class="h-16 w-16 rounded-full bg-white border border-slate-200 flex items-center justify-center font-bold text-[#6d28d9] relative overflow-hidden" id="settings-avatar-pic">Pic</div>
+                  <div class="space-y-1">
+                    <!-- Hidden input fields to trigger native upload and camera options -->
+                    <input type="file" id="avatar-file-input" accept="image/*" class="hidden" />
+                    <button type="button" id="btn-avatar-upload" class="px-3 py-1 bg-slate-100 border hover:bg-slate-200 rounded text-xs font-bold">Upload picture</button>
+                    <button type="button" id="btn-avatar-camera" class="px-3 py-1 bg-slate-100 border hover:bg-slate-200 rounded text-xs font-bold">Use Camera</button>
+                    <button type="button" id="btn-avatar-remove" class="px-3 py-1 text-rose-500 hover:bg-rose-50 rounded text-xs font-semibold">Remove</button>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">First Name</label><input type="text" id="set-profile-fn" class="w-full border p-2 rounded-lg" placeholder="Enter first name" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Last Name</label><input type="text" id="set-profile-ln" class="w-full border p-2 rounded-lg" placeholder="Enter last name" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Workspace Display Name</label><input type="text" id="set-profile-display" class="w-full border p-2 rounded-lg" placeholder="Enter display name" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Address</label><input type="email" id="set-profile-email" class="w-full border p-2 rounded-lg" placeholder="Enter email address" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Phone Number</label><input type="text" id="set-profile-phone" class="w-full border p-2 rounded-lg" placeholder="Enter phone number" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Gender</label>
+                    <select id="set-profile-gender" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="Male" selected>Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Country</label>
+                    <select id="set-profile-country" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="NG" selected>Nigeria</option>
+                      <option value="US">United States</option>
+                      <option value="GB">United Kingdom</option>
+                      <option value="CA">Canada</option>
+                      <option value="DE">Germany</option>
+                      <option value="ZA">South Africa</option>
+                      <option value="KE">Kenya</option>
+                      <option value="GH">Ghana</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Preferred Language</label>
+                    <select id="set-profile-lang" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="en" selected>English (US)</option>
+                      <option value="en-gb">English (UK)</option>
+                      <option value="yo">Yoruba</option>
+                      <option value="ha">Hausa</option>
+                      <option value="ig">Igbo</option>
+                      <option value="es">Español</option>
+                      <option value="fr">Français</option>
+                      <option value="de">Deutsch</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">About Bio</label><textarea id="set-profile-bio" rows="2" class="w-full border p-2 rounded-lg" placeholder="Write something about yourself"></textarea></div>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Timezone</label>
+                    <select id="set-profile-timezone" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="WAT" selected>West Africa Time (WAT) - GMT +01:00</option>
+                      <option value="GMT">Greenwich Mean Time (GMT) - GMT +00:00</option>
+                      <option value="EST">Eastern Standard Time (EST) - GMT -05:00</option>
+                      <option value="PST">Pacific Standard Time (PST) - GMT -08:00</option>
+                      <option value="CET">Central European Time (CET) - GMT +01:00</option>
+                      <option value="EAT">East Africa Time (EAT) - GMT +03:00</option>
+                      <option value="JST">Japan Standard Time (JST) - GMT +09:00</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: SECURITY POLICIES -->
+              <div id="settings-pane-security" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Security Policies</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Current Password</label>
+                    <input type="password" id="set-security-old-password" class="w-full border p-2 rounded-lg" />
+                  </div>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">New Password</label>
+                      <input type="password" id="set-security-password" class="w-full border p-2 rounded-lg" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Confirm New Password</label>
+                      <input type="password" id="set-security-confirm" class="w-full border p-2 rounded-lg" />
+                    </div>
+                  </div>
+                  <div>
+                    <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                      <div id="password-strength-bar" class="h-full bg-slate-300 w-0 transition-all"></div>
+                    </div>
+                    <span id="password-strength-label" class="text-[10px] font-bold uppercase text-slate-400 mt-1 block">Strength: Enter password</span>
+                  </div>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-100 rounded-lg space-y-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-700">Two-Factor Authentication (2FA)</span>
+                    <input type="checkbox" id="set-security-2fa" class="h-4 w-4" />
+                  </div>
+                  <p class="text-slate-400 text-xs">Verify active logins using verified email or phone parameter channels.</p>
+                </div>
+                <div class="p-4 bg-slate-50 border border-slate-100 rounded-lg space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-700">All Device Sessions</span>
+                    <button type="button" id="btn-logout-all-devices" class="px-2.5 py-1 text-rose-500 hover:bg-rose-50 rounded text-xs font-bold border">Log Out Everywhere</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: APPEARANCE STYLES -->
+              <div id="settings-pane-appearance" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Appearance Styles</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Theme Palette</label>
+                    <select id="set-app-theme" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="light" selected>Standard Light Mode</option>
+                      <option value="dark">Pro Dark Mode</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Accent Accent Color</label>
+                    <select id="set-app-accent" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="blue" selected>SaaS Corporate Blue</option>
+                      <option value="emerald">Organic Green</option>
+                    </select>
+                  </div>
+                  <div class="flex items-center justify-between border p-3 rounded-lg col-span-2">
+                    <div>
+                      <span class="font-bold block">Compact Data Mode</span>
+                      <span class="text-[10px] text-slate-400 block mt-0.5">Reduces workspace padding parameters.</span>
+                    </div>
+                    <input type="checkbox" id="set-app-compact" class="h-4 w-4" />
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: NOTIFICATION TRIGGERS -->
+              <div id="settings-pane-notifications" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Notification Triggers</h3>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between border-b pb-2"><span>Email Alerts</span><input type="checkbox" id="set-notif-email" checked class="h-4 w-4" /></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Browser Notifications</span><input type="checkbox" id="set-notif-browser" class="h-4 w-4" /></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Upcoming Task Reminders</span><input type="checkbox" id="set-notif-task" checked class="h-4 w-4" /></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Deal Pipeline Updates</span><input type="checkbox" id="set-notif-deals" class="h-4 w-4" /></div>
+                </div>
+              </div>
+
+              <!-- TAB: WORKSPACE PREFERENCES -->
+              <div id="settings-pane-preferences" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Workspace Preferences</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Default View on Boot</label>
+                    <select id="set-pref-boot" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="dashboard" selected>Executive Dashboard</option>
+                      <option value="leads">Leads Directory</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Base Currency</label>
+                    <select id="set-pref-currency" class="w-full border p-2 bg-white rounded-lg">
+                      <option value="NGN" selected>Nigerian Naira (NGN) - ₦</option>
+                      <option value="USD">United States Dollar (USD) - $</option>
+                      <option value="EUR">Euro (EUR) - €</option>
+                      <option value="GBP">British Pound (GBP) - £</option>
+                      <option value="CAD">Canadian Dollar (CAD) - $</option>
+                      <option value="ZAR">South African Rand (ZAR) - R</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB: USERS & PERMISSIONS -->
+              <div id="settings-pane-usersRoles" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">User & Permission Management</h3>
+                <div class="border rounded-lg overflow-hidden bg-white">
+                  <table class="w-full text-left border-collapse text-[11px]">
+                    <thead>
+                      <tr class="bg-slate-50 border-b font-bold text-slate-500 uppercase"><th class="p-2">Full Name</th><th class="p-2">Role Profile</th><th class="p-2">Status</th><th class="p-2 text-right">Actions</th></tr>
+                    </thead>
+                    <tbody id="set-users-list-body" class="divide-y"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- TAB: ORGANIZATION DETAILS -->
+              <div id="settings-pane-organization" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Organization Details</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company Legal Name</label><input type="text" id="set-org-name" class="w-full border p-2 rounded-lg" value="SalesFlow CRM" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Website URL</label><input type="url" id="set-org-web" class="w-full border p-2 rounded-lg" placeholder="https://yourcompany.com" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company Email</label><input type="email" id="set-org-email" class="w-full border p-2 rounded-lg" placeholder="office@company.com" /></div>
+                  <div><label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Address</label><input type="text" id="set-org-address" class="w-full border p-2 rounded-lg" placeholder="Company address" /></div>
+                </div>
+              </div>
+
+              <!-- TAB: INTEGRATIONS -->
+              <div id="settings-pane-integrations" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Integrations & API Channels</h3>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between border-b pb-2"><span>Gmail Sync Syncing</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Gmail">Connect</button></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Slack Notifications</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Slack">Connect</button></div>
+                  <div class="flex items-center justify-between border-b pb-2"><span>Stripe Gateway</span><button type="button" class="btn-api-connect px-2 py-1 bg-slate-100 border hover:bg-slate-200 rounded font-bold text-[10px]" data-service="Stripe">Connect</button></div>
+                </div>
+              </div>
+
+              <!-- TAB: DATA MANAGEMENT -->
+              <div id="settings-pane-data-mgt" class="settings-panel-view space-y-4 hidden">
+                <h3 class="text-sm font-bold text-slate-800 border-b pb-2 uppercase">Data Management</h3>
+                <div class="flex flex-col gap-4">
+                  <div class="flex space-x-2">
+                    <button type="button" id="btn-data-export" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 border rounded-lg font-bold text-xs">Export Profile Data</button>
+                    <button type="button" id="btn-data-clear" class="px-4 py-2 text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-lg font-bold text-xs">Clear Records</button>
+                  </div>
+                  
+                  <!-- ACCOUNT STATUS CONFIGURATION BLOCK -->
+                  <div class="p-4 bg-rose-50/50 border border-rose-100 rounded-xl space-y-3">
+                    <span class="font-extrabold text-rose-700 text-xs block uppercase font-bold">Delete Account & Profile Status Options</span>
+                    <p class="text-slate-500 text-xs font-semibold leading-normal">
+                      Update your account state. Choose to temporarily suspend your workspace interactions, archive active records, or permanently purge all profiles.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                      <button type="button" id="btn-temp-suspend" class="px-3 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 rounded font-bold text-xs transition-colors">Temporary Suspension</button>
+                      <button type="button" id="btn-archive-account" class="px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 rounded font-bold text-xs transition-colors">Archive Account</button>
+                      <button type="button" id="btn-delete-account" class="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded font-extrabold text-xs transition-all">Permanent Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ==========================================
+       MODAL DIALOGS
+       ========================================== -->
+
+  <!-- MEDIA DEVICE CAMERA CAPTURE DIALOG -->
+  <div id="modal-camera" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white dark:bg-[#111827] w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4 border border-slate-200 dark:border-slate-800">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 class="font-bold text-slate-900 dark:text-white text-sm">Capture Avatar Photo</h3>
+        <button type="button" id="btn-close-camera" class="text-slate-400 hover:text-slate-600 dark:hover:text-white text-sm font-bold">✕</button>
+      </div>
+      <div class="relative bg-slate-900 rounded-lg overflow-hidden h-64 flex items-center justify-center">
+        <video id="camera-stream" autoplay playsinline class="w-full h-full object-cover"></video>
+        <canvas id="camera-canvas" class="hidden"></canvas>
+      </div>
+      <div class="flex justify-end space-x-2 pt-2">
+        <button type="button" id="btn-capture-snapshot" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs">Capture Snapshot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTE CREATION DIALOG -->
+  <div id="modal-note" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-slate-900 text-sm">Create Workspace Note</h3>
+      <form id="form-note" class="space-y-4">
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Note Title</label>
+          <input type="text" id="note-title" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Category</label>
+          <select id="note-category" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold">
+            <option value="general">General Drafts</option>
+            <option value="sales">Sales Outline</option>
+            <option value="follow">Followups</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Content details</label>
+          <textarea id="note-content" required rows="4" class="w-full border rounded-lg p-2 text-xs font-semibold"></textarea>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" class="px-4 py-2 border rounded-lg font-semibold hover:bg-slate-50 text-xs" id="btn-close-note-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 text-xs">Save Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LEAD DIALOG -->
+  <div id="modal-lead" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-slate-900 text-sm">Register New Lead</h3>
+      <form id="form-lead" class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">First Name</label>
+            <input type="text" id="lead-firstname" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Last Name</label>
+            <input type="text" id="lead-lastname" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Company</label>
+          <input type="text" id="lead-company" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Email Address</label>
+          <input type="email" id="lead-email" class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Estimated Value</label>
+            <input type="number" id="lead-value" placeholder="0" class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Source</label>
+            <input type="text" id="lead-source" placeholder="Website" class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Assign User</label>
+          <select id="lead-assignee" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold"></select>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" class="px-4 py-2 border rounded-lg font-semibold hover:bg-slate-50 text-xs" id="btn-close-lead-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-slate-800 text-white rounded-lg font-semibold hover:bg-slate-900 text-xs">Save Lead</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DEAL DIALOG -->
+  <div id="modal-deal" class="fixed inset-0 bg-[#0c0f24]/50 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-slate-900 text-sm">Create New Opportunity</h3>
+      <form id="form-deal" class="space-y-4">
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Select Customer</label>
+          <select id="deal-customer" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold" required></select>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Opportunity Title</label>
+          <input type="text" id="deal-name" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Value ($)</label>
+            <input type="number" id="deal-amount" placeholder="0" class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Expected Close Date</label>
+            <input type="date" id="deal-closedate" class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Initial Stage</label>
+          <select id="deal-stage" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold">
+            <option value="Prospecting">Prospecting</option>
+            <option value="Demo Scheduled">Demo Scheduled</option>
+            <option value="Proposal Sent">Proposal Sent</option>
+            <option value="Negotiation">Negotiation</option>
+          </select>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" class="px-4 py-2 border rounded-lg font-semibold hover:bg-slate-50 text-xs" id="btn-close-deal-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 text-xs">Save Opportunity</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TASK DIALOG -->
+  <div id="modal-task" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-slate-900 text-sm">Create New Task</h3>
+      <form id="form-task" class="space-y-4">
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Task Title</label>
+          <input type="text" id="task-title" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Description</label>
+          <textarea id="task-desc" rows="2" class="w-full border rounded-lg p-2 text-[11px] font-semibold"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Priority</label>
+            <select id="task-priority" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Due Date</label>
+            <input type="date" id="task-duedate" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Assign User</label>
+          <select id="task-assignee" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold"></select>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" class="px-4 py-2 border rounded-lg font-semibold hover:bg-slate-50 text-xs" id="btn-close-task-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 text-xs">Save Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- EMAIL LOG DIALOG -->
+  <div id="modal-email" class="fixed inset-0 bg-[#0c0f24]/50 backdrop-blur-xs flex items-center justify-center hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-xl p-6 shadow-2xl space-y-4">
+      <h3 class="font-bold text-slate-900 text-sm">Log Email Conversation</h3>
+      <form id="form-email" class="space-y-4">
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Select Customer</label>
+          <select id="email-customer" class="w-full border rounded-lg p-2 bg-white text-xs font-semibold"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Subject</label>
+          <input type="text" id="email-subject" required class="w-full border rounded-lg p-2 text-xs font-semibold" />
+        </div>
+        <div>
+          <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Message</label>
+          <textarea id="email-message" required rows="4" class="w-full border rounded-lg p-2 text-[11px] font-semibold"></textarea>
+        </div>
+        <div class="flex justify-end space-x-2 pt-2">
+          <button type="button" class="px-4 py-2 border rounded-lg font-semibold hover:bg-slate-50 text-xs" id="btn-close-email-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 text-xs">Log Email</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Portals -->
+  <div id="toast-portal" class="fixed bottom-5 right-5 space-y-2 z-50"></div>
+
+  <script src="/salesflow-crm.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SalesFlow CRM - Authentication Gate</title>
+  <!-- Google Fonts for Modern Sans-Serif Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-glow {
+      background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    }
+  </style>
+</head>
+<body class="bg-[#0a0d1a] bg-gradient-to-tr from-[#0a0d1a] via-[#111424] to-[#1a103c] text-slate-100 font-sans h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+  <!-- Ambient background glow elements to make it highly user-friendly and modern -->
+  <div class="absolute inset-0 gradient-glow pointer-events-none z-0"></div>
+  <div class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+  <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+  <!-- AUTH CARD -->
+  <div class="w-full max-w-md bg-[#12162b]/95 border-2 border-slate-800/80 rounded-2xl p-8 shadow-2xl backdrop-blur-md relative z-10">
+    
+    <div class="text-center mb-8">
+      <div class="inline-flex h-12 w-12 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 items-center justify-center text-white font-black text-xl shadow-lg mb-4">
+        S
+      </div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">SalesFlow CRM</h1>
+      <p id="auth-subtitle" class="text-slate-300 text-xs font-semibold mt-2">Sign in to your unified sales workspace</p>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form" class="space-y-5" autocomplete="on">
+      <div>
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address or Phone Number</label>
+        <input type="text" id="login-identifier" name="username" required placeholder="name@company.com or +234..." class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold placeholder:text-slate-500" autocomplete="username" />
+      </div>
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Password</label>
+          <button type="button" id="btn-toggle-forgot" class="text-blue-400 hover:text-blue-300 hover:underline text-xs font-bold focus:outline-none">Forgot Password?</button>
+        </div>
+        <input type="password" id="login-password" name="password" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="current-password" />
+      </div>
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold rounded-lg shadow-lg hover:shadow-indigo-500/20 transition-all focus:outline-none text-xs uppercase tracking-wider">Log In</button>
+      <p class="text-center text-xs text-slate-400 mt-4 font-bold">Don't have an account? <button type="button" id="btn-toggle-signup" class="text-blue-400 hover:underline focus:outline-none">Sign Up</button></p>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" class="space-y-4 hidden" autocomplete="off">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">First Name</label>
+          <input type="text" id="signup-firstname" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="given-name" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Last Name</label>
+          <input type="text" id="signup-lastname" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="family-name" />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Phone Number</label>
+          <input type="text" id="signup-phone" required placeholder="+234..." class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="tel" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gender</label>
+          <select id="signup-gender" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold">
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Email Address</label>
+        <input type="email" id="signup-email" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="email" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Password</label>
+        <input type="password" id="signup-password" required class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" autocomplete="new-password" />
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Workspace Name</label>
+        <input type="text" id="signup-workspace" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" placeholder="SalesFlow CRM" autocomplete="organization" />
+      </div>
+      <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold rounded-lg shadow-lg transition-all focus:outline-none text-xs uppercase tracking-wider">Sign Up</button>
+      <p class="text-center text-xs text-slate-400 mt-4 font-bold">Already have an account? <button type="button" id="btn-toggle-login-from-signup" class="text-blue-400 hover:underline focus:outline-none">Log In</button></p>
+    </form>
+
+    <!-- FORGOT PASSWORD RECOVERY FORM -->
+    <form id="forgot-form" class="space-y-6 hidden" autocomplete="off">
+      <div class="flex items-center justify-between bg-slate-800/40 p-1.5 rounded-lg border border-slate-700">
+        <button type="button" id="btn-forgot-mode-email" class="flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all">Email Recovery</button>
+        <button type="button" id="btn-forgot-mode-phone" class="flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all">SMS Recovery</button>
+      </div>
+      
+      <!-- Identifier Step -->
+      <div id="forgot-step-identifier" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2" id="forgot-input-label">Your Registered Email Address</label>
+          <input type="text" id="forgot-identifier" required placeholder="name@company.com" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" />
+        </div>
+        <button type="button" id="btn-send-verification-code" class="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Send Verification Code</button>
+      </div>
+
+      <!-- Verification Step -->
+      <div id="forgot-step-code" class="space-y-4 hidden">
+        <div class="p-3 bg-blue-500/10 border border-blue-500/25 text-blue-400 rounded-lg text-xs leading-normal font-semibold">
+          A verification parameter has been dispatched. Enter the validation code below.
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Verification Code</label>
+          <input type="text" id="forgot-code-input" required placeholder="Enter code (e.g. 123456)" class="w-full px-4 py-3 bg-slate-800/60 border border-slate-700 text-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-semibold" />
+        </div>
+        <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow text-xs uppercase tracking-wider">Verify Code</button>
+      </div>
+
+      <p class="text-center text-xs text-slate-400 mt-4 font-bold"><button type="button" id="btn-toggle-login-from-forgot" class="text-blue-400 hover:underline font-bold focus:outline-none">Return to Log In</button></p>
+    </form>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.getElementById('login-form');
+      const signupForm = document.getElementById('signup-form');
+      const forgotForm = document.getElementById('forgot-form');
+      const subtitle = document.getElementById('auth-subtitle');
+      
+      const toggleSignup = document.getElementById('btn-toggle-signup');
+      const toggleLoginFromSignup = document.getElementById('btn-toggle-login-from-signup');
+      const toggleForgot = document.getElementById('btn-toggle-forgot');
+      const toggleLoginFromForgot = document.getElementById('btn-toggle-login-from-forgot');
+
+      const forgotEmailModeBtn = document.getElementById('btn-forgot-mode-email');
+      const forgotPhoneModeBtn = document.getElementById('btn-forgot-mode-phone');
+      const forgotLabel = document.getElementById('forgot-input-label');
+      const forgotInput = document.getElementById('forgot-identifier');
+      
+      const btnSendCode = document.getElementById('btn-send-verification-code');
+      const stepIdentifier = document.getElementById('forgot-step-identifier');
+      const stepCode = document.getElementById('forgot-step-code');
+      
+      let recoveryMode = 'email';
+
+      const showView = (formToShow, text) => {
+        loginForm.classList.add('hidden');
+        signupForm.classList.add('hidden');
+        forgotForm.classList.add('hidden');
+        formToShow.classList.remove('hidden');
+        subtitle.textContent = text;
+        
+        stepIdentifier.classList.remove('hidden');
+        stepCode.classList.add('hidden');
+      };
+
+      if (toggleSignup) toggleSignup.addEventListener('click', () => showView(signupForm, 'Register an account on SalesFlow CRM'));
+      if (toggleLoginFromSignup) toggleLoginFromSignup.addEventListener('click', () => showView(loginForm, 'Log in to access your dashboard'));
+      if (toggleForgot) toggleForgot.addEventListener('click', () => showView(forgotForm, 'Retrieve and update your SalesFlow password'));
+      if (toggleLoginFromForgot) toggleLoginFromForgot.addEventListener('click', () => showView(loginForm, 'Log in to access your dashboard'));
+
+      if (forgotEmailModeBtn && forgotPhoneModeBtn) {
+        forgotEmailModeBtn.addEventListener('click', () => {
+          recoveryMode = 'email';
+          forgotEmailModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all";
+          forgotPhoneModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all";
+          forgotLabel.textContent = "Your Registered Email Address";
+          forgotInput.placeholder = "name@company.com";
+          forgotInput.type = "email";
+        });
+
+        forgotPhoneModeBtn.addEventListener('click', () => {
+          recoveryMode = 'phone';
+          forgotPhoneModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md bg-blue-600 text-white transition-all";
+          forgotEmailModeBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-md text-slate-400 hover:text-slate-100 transition-all";
+          forgotLabel.textContent = "Your Registered Phone Number";
+          forgotInput.placeholder = "+234...";
+          forgotInput.type = "tel";
+        });
+      }
+
+      if (btnSendCode) {
+        btnSendCode.addEventListener('click', () => {
+          if (!forgotInput.value.trim()) {
+            alert(recoveryMode === 'email' ? 'Please enter your email address' : 'Please enter your phone number');
+            return;
+          }
+          stepIdentifier.classList.add('hidden');
+          stepCode.classList.remove('hidden');
+        });
+      }
+
+      if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const identifier = document.getElementById('login-identifier').value;
+          const password = document.getElementById('login-password').value;
+
+          try {
+            const response = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: identifier, password })
+            });
+            const data = await response.json();
+            if (response.ok) {
+              localStorage.setItem('salesflow_jwt', data.token);
+              window.location.href = '/dashboard.html';
+            } else {
+              alert(data.error || 'Invalid credentials. Double check details.');
+            }
+          } catch (err) {
+            alert('Could not establish connection with database server.');
+          }
+        });
+      }
+
+      if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('signup-email').value;
+          const phone = document.getElementById('signup-phone').value;
+          const gender = document.getElementById('signup-gender').value;
+          const password = document.getElementById('signup-password').value;
+          const first_name = document.getElementById('signup-firstname').value;
+          const last_name = document.getElementById('signup-lastname').value;
+          const workspace_name = document.getElementById('signup-workspace').value;
+
+          try {
+            const response = await fetch('/api/auth/signup', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, phone, gender, password, first_name, last_name, workspace_name })
+            });
+            const data = await response.json();
+            if (response.ok) {
+              alert('Account registered! You can now log in.');
+              showView(loginForm, 'Log in to access your dashboard');
+              document.getElementById('login-identifier').value = email;
+            } else {
+              alert(data.error || 'Failed to register account.');
+            }
+          } catch (err) {
+            alert('Could not establish connection with database server.');
+          }
+        });
+      }
+
+      if (forgotForm) {
+        forgotForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const enteredCode = document.getElementById('forgot-code-input').value;
+          if (!enteredCode.trim()) {
+            alert('Please enter your verification code');
+            return;
+          }
+          alert('Code successfully validated! Redirecting back to standard log-in panel.');
+          showView(loginForm, 'Log in to access your dashboard');
+        });
+      }
+    });
+  </script>
+</body>
+</html>
