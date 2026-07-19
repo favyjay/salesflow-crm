@@ -367,9 +367,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Render Charts
   function renderSalesChart(salesByMonth) {
-    const ctx = document.getElementById('pipeline-engagement-chart');
-    if (!ctx) return;
+    const canvas = document.getElementById('pipeline-engagement-chart');
+    if (!canvas) return;
 
+    const ctx = canvas.getContext('2d');
     if (salesChartInstance) {
       salesChartInstance.destroy();
     }
@@ -397,6 +398,40 @@ document.addEventListener('DOMContentLoaded', () => {
           x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } },
           y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter', size: 10 } } }
         }
+      }
+    });
+  }
+
+  // Render Reports progression chart safely using direct context retrieval
+  function renderReportsChart(salesByMonth) {
+    const canvas = document.getElementById('revenue-progression-chart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (reportsChartInstance) {
+      reportsChartInstance.destroy();
+    }
+
+    const labels = salesByMonth.map(s => s.name);
+    const dataValues = salesByMonth.map(s => s.revenue);
+
+    reportsChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Revenue Trend',
+          data: dataValues,
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
       }
     });
   }
@@ -1313,7 +1348,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (page.label.toLowerCase().includes(query)) {
           resultsCount++;
           const item = document.createElement('button');
-          item.className = 'w-full text-left p-3 text-xs font-bold hover:bg-slate-50 block transition-all text-slate-700';
+          item.className = 'w-full text-left p-3 text-xs font-bold hover:bg-[#fafafa] block transition-all text-slate-700';
           item.innerHTML = `${page.label}`;
           item.addEventListener('click', () => {
             switchMainView(page.key);
