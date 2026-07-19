@@ -1295,6 +1295,7 @@ document.addEventListener('DOMContentLoaded', () => {
       searchDropdown.innerHTML = '';
       let resultsCount = 0;
 
+      // Cleaned search index containing only actual features, removing AI Insights from search engine
       const staticPages = [
         { label: 'Dashboard', key: 'dashboard' },
         { label: 'Leads', key: 'leads' },
@@ -1304,7 +1305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         { label: 'Emails', key: 'emails' },
         { label: 'Calculator', key: 'calculator' },
         { label: 'Notes', key: 'notes' },
-        { label: 'AI Insights', key: 'aiInsights' },
         { label: 'Reports', key: 'reports' },
         { label: 'Settings', key: 'settings' }
       ];
