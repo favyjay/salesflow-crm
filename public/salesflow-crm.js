@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { id: 'n2', text: 'Neon database server connected on port 3001', date: '10 mins ago' }
   ];
 
+  // Separates 401 (Session Expired) and 403 (No Permission) to prevent automatic logout loops
   async function fetchSecure(url, options = {}) {
     const headers = {
       'Content-Type': 'application/json',
@@ -34,10 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const response = await fetch(url, { ...options, headers });
 
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
       localStorage.removeItem('salesflow_jwt');
       window.location.href = '/index.html';
       throw new Error('Unauthorized session token');
+    }
+
+    if (response.status === 403) {
+      showToast("Access Denied: Administrator permissions required.", "error");
+      throw new Error('Forbidden resource access');
     }
 
     return response.json();
@@ -253,16 +259,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Header collapse toggle button (Unified system collapse similar to Google AI Studio)
+  // Header collapse toggle button - handles responsive drawer toggling on mobile
   const mobileMenuToggleBtn = document.getElementById('mobile-menu-toggle-btn');
   if (mobileMenuToggleBtn) {
     mobileMenuToggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      const sidebar = document.getElementById('main-sidebar');
+      if (!sidebar) return;
+
       if (window.innerWidth < 768) {
-        const sidebar = document.getElementById('main-sidebar');
-        if (sidebar) {
-          sidebar.classList.toggle('hidden');
-        }
+        sidebar.classList.toggle('hidden');
+        sidebar.classList.toggle('flex');
+        sidebar.classList.toggle('fixed');
+        sidebar.classList.toggle('inset-y-0');
+        sidebar.classList.toggle('left-0');
+        sidebar.classList.toggle('z-50');
       } else {
         isSidebarCollapsed = !isSidebarCollapsed;
         localStorage.setItem('salesflow_sidebar_collapsed', isSidebarCollapsed);
@@ -270,6 +281,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Handle tap-outside-to-close events on mobile viewports
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth < 768) {
+      const sidebar = document.getElementById('main-sidebar');
+      const toggle = document.getElementById('mobile-menu-toggle-btn');
+      if (sidebar && !sidebar.classList.contains('hidden') && !sidebar.contains(e.target) && e.target !== toggle) {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('flex', 'fixed', 'inset-y-0', 'left-0', 'z-50');
+      }
+    }
+  });
 
   // Responsive Sidebar collapsing adjustments to prevent layout offsets
   function applySidebarState(collapsed) {
@@ -805,9 +828,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="py-2.5"><span class="px-2 py-0.5 rounded bg-blue-50 text-blue-600 font-bold uppercase text-[9px]">${lead.status || 'new'}</span></td>
           <td class="py-2.5 text-right flex justify-end gap-1.5">
             ${lead.status !== 'converted' ? `
-              <button class="btn-convert px-2 py-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded font-bold transition-all font-bold">Convert</button>
+              <button class="btn-convert px-2 py-1 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded font-bold transition-all">Convert</button>
             ` : `<span class="text-slate-400 italic font-bold py-1">Converted</span>`}
-            <button class="btn-del-lead px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all font-bold">Delete</button>
+            <button class="btn-del-lead px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all">Delete</button>
           </td>
         `;
 
@@ -873,7 +896,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td class="py-2.5 text-slate-500">${contact.companyName || ''}</td>
           <td class="py-2.5 text-slate-500">${contact.email || ''}</td>
           <td class="py-2.5 text-right">
-            <button class="btn-del-cust px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all font-bold">Delete</button>
+            <button class="btn-del-cust px-2 py-1 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded font-bold transition-all">Delete</button>
           </td>
         `;
 
@@ -1290,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ========================================================
   // LIVE GLOBAL SEARCH ENGINE (Strict Exclusions applied)
   // ========================================================
-  const searchInput = document.getElementById('crm-search-query-field');
+  const searchInput = document.getElementById('global-search-input');
   const searchDropdown = document.getElementById('search-results-dropdown');
 
   if (searchInput && searchDropdown) {
@@ -1304,19 +1327,17 @@ document.addEventListener('DOMContentLoaded', () => {
       searchDropdown.innerHTML = '';
       let resultsCount = 0;
 
-      // Strict index limited exactly to active elements shown on the sidebar layout
       const staticPages = [
-        { label: 'Dashboard', key: 'dashboard' },
-        { label: 'Leads', key: 'leads' },
-        { label: 'Customers', key: 'customers' },
-        { label: 'Pipeline', key: 'pipeline' },
-        { label: 'Tasks', key: 'tasks' },
-        { label: 'Emails', key: 'emails' },
-        { label: 'Calculator', key: 'calculator' },
-        { label: 'Notes', key: 'notes' },
-        { label: 'AI Insights', key: 'aiInsights' },
-        { label: 'Reports', key: 'reports' },
-        { label: 'Settings', key: 'settings' }
+        { label: 'Executive Dashboard summary', key: 'dashboard' },
+        { label: 'Leads Management Directory', key: 'leads' },
+        { label: 'Converted Customers Index', key: 'customers' },
+        { label: 'Task Follow-up Checklists', key: 'tasks' },
+        { label: 'Email Communication Logs', key: 'emails' },
+        { label: 'SaaS Calculator Suite', key: 'calculator' },
+        { label: 'Workspace Notepad Notes', key: 'notes' },
+        { label: 'Flow AI Insights Copilot', key: 'aiInsights' },
+        { label: 'Reports & conversion Funnels', key: 'reports' },
+        { label: 'System Settings Profiles', key: 'settings' }
       ];
 
       staticPages.forEach(page => {
@@ -1344,40 +1365,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
         searchDropdown.classList.add('hidden');
       }
-    });
-  }
-
-  // ========================================================
-  // HEADER PROFILE DROPDOWN WIDGET CONTROLLER
-  // ========================================================
-  const headerProfileBtn = document.getElementById('btn-header-profile');
-  const profileDropdownPanel = document.getElementById('profile-header-dropdown');
-  const profileToSettingsBtn = document.getElementById('btn-profile-to-settings');
-  const profileLogoutBtn = document.getElementById('btn-profile-logout');
-
-  if (headerProfileBtn && profileDropdownPanel) {
-    headerProfileBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      profileDropdownPanel.classList.toggle('hidden');
-    });
-    document.addEventListener('click', () => {
-      profileDropdownPanel.classList.add('hidden');
-    });
-    profileDropdownPanel.addEventListener('click', (e) => e.stopPropagation());
-  }
-
-  if (profileToSettingsBtn) {
-    profileToSettingsBtn.addEventListener('click', () => {
-      switchMainView('settings');
-      if (profileDropdownPanel) profileDropdownPanel.classList.add('hidden');
-    });
-  }
-
-  if (profileLogoutBtn) {
-    profileLogoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('salesflow_jwt');
-      alert("You have been logged out successfully.");
-      window.location.href = '/index.html';
     });
   }
 
@@ -1442,78 +1429,6 @@ document.addEventListener('DOMContentLoaded', () => {
       notificationAlerts = [];
       updateHeaderAlertsBadge();
     });
-  }
-
-  // ========================================================
-  // AI INSIGHTS NAVIGATION ROUTER
-  // ========================================================
-  const aiChatInput = document.getElementById('ai-chat-input');
-  const aiChatSend = document.getElementById('ai-chat-send');
-  const aiChatMessages = document.getElementById('ai-chat-messages');
-
-  if (aiChatInput && aiChatSend) {
-    const triggerChatResponse = () => {
-      const query = aiChatInput.value.trim();
-      if (!query) return;
-
-      appendAiMessage(query, 'user');
-      aiChatInput.value = '';
-
-      setTimeout(() => {
-        const lowerQuery = query.toLowerCase();
-        let targetView = '';
-        let routeMsg = '';
-
-        if (lowerQuery.includes('dashboard') || lowerQuery.includes('overview')) {
-          targetView = 'dashboard';
-        } else if (lowerQuery.includes('lead')) {
-          targetView = 'leads';
-        } else if (lowerQuery.includes('customer') || lowerQuery.includes('client') || lowerQuery.includes('contact')) {
-          targetView = 'customers';
-        } else if (lowerQuery.includes('pipeline') || lowerQuery.includes('kanban') || lowerQuery.includes('deals')) {
-          targetView = 'pipeline';
-        } else if (lowerQuery.includes('task') || lowerQuery.includes('checklist') || lowerQuery.includes('todo')) {
-          targetView = 'tasks';
-        } else if (lowerQuery.includes('email') || lowerQuery.includes('log')) {
-          targetView = 'emails';
-        } else if (lowerQuery.includes('calculator') || lowerQuery.includes('math') || lowerQuery.includes('formula')) {
-          targetView = 'calculator';
-        } else if (lowerQuery.includes('note') || lowerQuery.includes('notepad') || lowerQuery.includes('scratchpad')) {
-          targetView = 'notes';
-        } else if (lowerQuery.includes('report') || lowerQuery.includes('funnel') || lowerQuery.includes('analytics')) {
-          targetView = 'reports';
-        } else if (lowerQuery.includes('setting') || lowerQuery.includes('profile')) {
-          targetView = 'settings';
-        }
-
-        if (targetView) {
-          switchMainView(targetView);
-          routeMsg = `Intent recognized. programmatically navigating workspace to the ${targetView.toUpperCase()} interface. Let me know if there's anything specific to analyze here!`;
-        } else {
-          routeMsg = "I'm analyzing your request. Try asking me to 'navigate to Leads' or 'go to settings' for unified workspace navigation.";
-        }
-
-        appendAiMessage(routeMsg, 'system');
-      }, 700);
-    };
-
-    aiChatSend.addEventListener('click', triggerChatResponse);
-    aiChatInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') triggerChatResponse();
-    });
-  }
-
-  function appendAiMessage(text, sender) {
-    if (!aiChatMessages) return;
-    const msgDiv = document.createElement('div');
-    if (sender === 'user') {
-      msgDiv.className = "p-3 bg-blue-50 border border-blue-100 rounded-xl leading-relaxed text-blue-900 text-xs self-end max-w-sm ml-auto font-semibold";
-    } else {
-      msgDiv.className = "p-3 bg-slate-100 border border-slate-200 rounded-xl leading-relaxed text-slate-800 text-xs self-start max-w-sm mr-auto font-semibold";
-    }
-    msgDiv.textContent = text;
-    aiChatMessages.appendChild(msgDiv);
-    aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
   }
 
   // ========================================================
@@ -1591,12 +1506,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = document.getElementById('lead-email').value;
       const value = document.getElementById('lead-value').value;
       const source = document.getElementById('lead-source').value;
-      const assignedRepId = document.getElementById('lead-assignee').value;
 
       try {
         const res = await fetchSecure('/leads', {
           method: 'POST',
-          body: JSON.stringify({ firstName, lastName, companyName, email, value, source, assignedRepId })
+          body: JSON.stringify({ firstName, lastName, companyName, email, value, source })
         });
         if (res && res.success) {
           showToast("Lead registered successfully", "success");
@@ -1733,7 +1647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Settings Save Handler (Saves to local configurations dynamically)
+  // Settings Save Handler (Binds to Profile Name & Company)
   const saveSettingsBtn = document.getElementById('btn-save-settings');
   if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener('click', async (e) => {
@@ -1760,35 +1674,27 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('salesflow_theme', themeSelector);
       localStorage.setItem('salesflow_compact_mode', compactSelector);
 
-      // Save localization parameters
-      const country = document.getElementById('set-profile-country').value;
-      const lang = document.getElementById('set-profile-lang').value;
-      const timezone = document.getElementById('set-profile-timezone').value;
-      const currency = document.getElementById('set-pref-currency').value;
-      const gender = document.getElementById('set-profile-gender').value;
-
-      localStorage.setItem('salesflow_country', country);
-      localStorage.setItem('salesflow_lang', lang);
-      localStorage.setItem('salesflow_timezone', timezone);
-      localStorage.setItem('salesflow_currency', currency);
-      localStorage.setItem('salesflow_gender', gender);
-
       try {
-        // Attempt backend endpoint persist
-        await fetchSecure('/users/profile', {
+        const res = await fetchSecure('/users/profile', {
           method: 'PATCH',
           body: JSON.stringify({ name: `${fn} ${ln}`.trim(), company, password })
         });
-      } catch (err) {
-        console.warn("Backend update channel bypassed. Local storage parameters updated.");
-      } finally {
+
         setTimeout(() => {
           if (spinner) spinner.classList.add('hidden');
-          showToast("System configurations successfully saved!", "success");
-          applySystemTheme(themeSelector);
-          applyCompactMode(compactSelector);
-          loadDashboard();
-        }, 500);
+          if (res && res.success) {
+            showToast("System configurations successfully saved to database!", "success");
+            applySystemTheme(themeSelector);
+            applyCompactMode(compactSelector);
+            loadDashboard();
+          } else {
+            showToast("Failed to commit profile parameters.", "error");
+          }
+        }, 600);
+
+      } catch (err) {
+        if (spinner) spinner.classList.add('hidden');
+        showToast("Network save failure", "error");
       }
     });
   }
@@ -1824,39 +1730,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Account Status Options (Reconfigured Controls)
-  const btnTempSuspend = document.getElementById('btn-temp-suspend');
+  // danger zone buttons
   const btnArchiveAccount = document.getElementById('btn-archive-account');
   const btnDeleteAccount = document.getElementById('btn-delete-account');
 
-  if (btnTempSuspend) {
-    btnTempSuspend.addEventListener('click', () => {
-      const confirmSuspend = confirm("Confirm request to temporarily suspend active operations? Your workspace access will be locked.");
-      if (confirmSuspend) {
-        localStorage.removeItem('salesflow_jwt');
-        showToast("Account status updated to suspended.", "success");
-        setTimeout(() => { window.location.href = '/index.html'; }, 800);
-      }
-    });
-  }
-
   if (btnArchiveAccount) {
     btnArchiveAccount.addEventListener('click', () => {
-      const confirmArchive = confirm("Confirm request to archive account profile? Active log details will be preserved, but access suspended.");
+      const confirmArchive = confirm("Confirm request to archive account profile? Access will be temporarily suspended.");
       if (confirmArchive) {
-        localStorage.removeItem('salesflow_jwt');
-        showToast("Archival sequence logged. Redirecting...", "success");
-        setTimeout(() => { window.location.href = '/index.html'; }, 800);
+        showToast("Archival request submitted successfully.", "success");
       }
     });
   }
 
   if (btnDeleteAccount) {
     btnDeleteAccount.addEventListener('click', () => {
-      const confirmDelete = confirm("Are you sure you want to permanently delete your CRM account? This operation is completely irreversible.");
+      const confirmDelete = confirm("Warning: Permanent account deletion. This operation is irreversible.");
       if (confirmDelete) {
         localStorage.removeItem('salesflow_jwt');
-        alert("Account records deleted. Returning to login interface.");
+        alert("Account deleted. Redirecting to login gateway.");
         window.location.href = '/index.html';
       }
     });
